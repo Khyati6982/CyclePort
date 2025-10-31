@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/* Enable dark mode via .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Define CyclePort's custom theme colors */
+:root {
+  --color-teal-500: oklch(70.4% 0.14 182.503);
+  --color-teal-300: oklch(85.5% 0.138 181.071);
+  --color-charcoal-900: oklch(21% 0.034 264.665);
+  --color-charcoal-700: oklch(37.3% 0.034 259.733);
+  --color-charcoal-100: oklch(96.7% 0.003 264.542);
+  --color-white: #fff;
+}
+
+/* Clean circular slider thumb */
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background-color: var(--color-teal-500);
+  cursor: pointer;
+  border: none;
+  margin-top: -4px;
+}
+
+input[type='range']::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background-color: var(--color-teal-500);
+  cursor: pointer;
+  border: none;
+}
+
+/* Reusable component styles */
+@layer components {
+  .btnPrimary {
+    @apply px-4 py-2 rounded transition-colors bg-[var(--color-teal-500)] text-[var(--color-white)];
+  }
+
+  .navLink {
+    @apply px-3 py-2 rounded transition-colors cursor-pointer text-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] hover:text-[var(--color-teal-500)] hover:bg-teal-100 dark:hover:bg-[var(--color-charcoal-700)] bg-transparent;
+  }
+
+  .navLink.active {
+    @apply font-bold text-[var(--color-teal-500)] bg-teal-100 dark:bg-[var(--color-charcoal-700)];
+  }
+
+  .navLogo {
+    @apply text-2xl font-bold text-[var(--color-teal-500)];
+  }
+
+  .navContainer {
+    @apply flex items-center justify-between px-6 py-4 sticky top-0 z-50 bg-[var(--color-white)] text-[var(--color-charcoal-900)] dark:bg-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] shadow-md dark:shadow-lg;
+  }
+
+  .hamburgerBtn {
+    @apply md:hidden text-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)];
+  }
+
+  .mobileMenu {
+    @apply z-50 absolute top-full left-0 w-full flex flex-col items-start px-6 py-4 space-y-2 transition-all duration-300 ease-in-out bg-[var(--color-white)] dark:bg-[var(--color-charcoal-900)];
+  }
+
+  .mobileNavLink {
+    @apply w-full text-left px-4 py-2 rounded transition-colors cursor-pointer text-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] hover:text-[var(--color-teal-500)] hover:bg-teal-100 dark:hover:bg-[var(--color-charcoal-700)] bg-transparent;
+  }
+
+  .mobileNavLink.active {
+    @apply font-bold text-[var(--color-teal-500)] bg-teal-100 dark:bg-[var(--color-charcoal-700)];
+  }
+
+  .footerContainer {
+    @apply text-center py-6 text-sm bg-[var(--color-charcoal-100)] text-[var(--color-charcoal-700)] dark:bg-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] shadow-inner;
+  }
+
+  .adminSidebar {
+    @apply w-64 min-h-screen bg-[var(--color-white)] dark:bg-[var(--color-charcoal-900)] shadow-md p-6;
+  }
+
+  .adminLink {
+    @apply block px-4 py-2 rounded transition-colors font-medium text-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] hover:text-[var(--color-teal-500)] hover:bg-teal-100 dark:hover:bg-[var(--color-charcoal-700)];
+  }
+
+  .adminLink.active {
+    @apply font-bold text-[var(--color-teal-500)] bg-teal-100 dark:bg-[var(--color-charcoal-700)] underline;
+  }
+
+  .formContainer {
+    @apply max-w-md mx-auto bg-white dark:bg-[var(--color-charcoal-900)] p-6 rounded-lg shadow-md dark:shadow-lg border border-gray-200 dark:border-gray-700;
+  }
+
+  .formTitle {
+    @apply text-2xl font-bold text-teal-500 dark:text-teal-300 mb-6 text-center;
+  }
+
+  .formInput {
+    @apply w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-800 dark:text-white;
+  }
+
+  .inputField {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded text-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition;
+  }
+  
+  .formButton {
+    @apply w-full px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition;
+  }
+
+  .formLink {
+    @apply block mt-4 text-sm text-center text-gray-500 dark:text-gray-400 underline underline-offset-2 hover:text-teal-500 hover:decoration-teal-500;
+  }
+
+  .Toastify__toast--success {
+    @apply text-white shadow-md rounded font-medium;
+  }
+
+  [data-theme="dark"] .Toastify__toast--success {
+    @apply bg-[oklch(21%_0.034_264.665)] border-[oklch(85.5%_0.138_181.071)];
+  }
+
+  [data-theme="light"] .Toastify__toast--success {
+    @apply bg-teal-500 border-teal-300;
+  }
+}

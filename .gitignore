@@ -1,0 +1,56 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+client/build/
+server/dist/
+server/build/
+
+# Environment variables
+client/.env
+client/.env.local
+client/.env.*.local
+server/.env
+server/.env.local
+server/.env.*.local
+
+# Vite/Parcel cache
+client/.vite/
+client/.cache/
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Seed data and local scripts
+# Keep folders, ignore only sensitive variants
+server/data/*.local.*
+*.local.js
+*.local.json
+
+# Optional: ignore entire folders (if not lore-bound)
+server/data/
+server/utils/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS-specific clutter
+.DS_Store
+Thumbs.db
