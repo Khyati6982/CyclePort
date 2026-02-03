@@ -27,11 +27,12 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter })
 
-router.post('/', /* protect, */ upload.single('image'), (req, res) => {
+router.post('/', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No image file uploaded.' })
   }
-  res.status(200).json({ imagePath: `/uploads/${req.file.filename}` })
+  const imageUrl = `${process.env.BASE_URL}/uploads/${req.file.filename}`;
+  res.status(200).json({ imagePath: imageUrl })
 })
 
 export default router
