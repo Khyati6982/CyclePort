@@ -88,7 +88,7 @@ function Navbar() {
   if (isLoading) return <p className="text-center mt-4">Loading...</p>;
 
   return (
-    <nav className="navContainer flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-4 pt-2 pb-0">
+    <nav className="navContainer flex flex-col md:flex-row items-center justify-between gap-4 px-4 pt-2 pb-0">
       {/* Logo + Hamburger */}
       <div className="w-full flex items-center justify-between md:w-auto">
         <NavLink
@@ -109,7 +109,7 @@ function Navbar() {
       </div>
 
       {/* Search */}
-      <div className="flex-grow max-w-md mx-auto hidden md:flex items-center">
+      <div className="flex-grow max-w-md hidden md:flex items-center md:ml-6">
         <input
           type="text"
           value={searchTerm}
