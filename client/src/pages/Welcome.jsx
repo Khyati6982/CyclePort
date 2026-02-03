@@ -50,7 +50,7 @@ export function Welcome() {
                 <img
                   src={
                     cycle.image?.startsWith("/uploads")
-                      ? `http://localhost:4000${cycle.image}`
+                      ? `${process.env.REACT_APP_BACKEND_URL}${cycle.image}`
                       : cycle.image
                   }
                   alt={`Image of ${cycle.name}`}
