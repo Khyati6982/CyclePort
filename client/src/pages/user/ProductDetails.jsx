@@ -102,8 +102,8 @@ const ProductDetails = () => {
 
   const { name, description, price, image, category } = selectedProduct;
   const imagePath = image?.startsWith("/uploads")
-    ? `http://localhost:4000${image}`
-    : image;
+  ? `${process.env.REACT_APP_BACKEND_URL}${image}`
+  : image;
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]">
