@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 import { addToCart } from "../../redux/slices/cartSlice";
 import { fetchProducts } from "../../redux/slices/productSlice";
 import { FiShoppingCart, FiSearch } from "react-icons/fi";
@@ -12,6 +13,11 @@ const UserProductList = () => {
   const cart = useSelector((state) => state.cart.items || []);
   const { user } = useSelector((state) => state.auth);
   const { products = [], loading, error } = useSelector((state) => state.products);
+
+  // 🚀 Fetch products automatically on mount
+  useEffect(() => {
+    dispatch(fetchProducts({}));
+  }, [dispatch]);
 
   const handleAddToCart = (product) => {
     if (!user) {

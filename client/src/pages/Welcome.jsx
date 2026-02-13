@@ -6,13 +6,15 @@ import { Link } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
 
 export function Welcome() {
-  const products = useSelector((state) => state.products.products || []);
   const dispatch = useDispatch();
+  const { products = [], loading, error } = useSelector((state) => state.products);
 
+  // 🚀 Fetch products on mount
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
+  // Memoize featured cycles
   const featuredCycles = useMemo(() => {
     return products.filter((cycle) => cycle.featured);
   }, [products]);
@@ -40,7 +42,16 @@ export function Welcome() {
         <h2 className="text-2xl font-bold text-teal-500 dark:text-teal-300 text-center mb-8">
           Featured Cycles
         </h2>
-        {featuredCycles.length > 0 ? (
+
+        {loading ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            Loading featured cycles...
+          </p>
+        ) : error ? (
+          <p className="text-center text-red-500 dark:text-red-400">
+            Failed to load featured cycles.
+          </p>
+        ) : featuredCycles.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {featuredCycles.map((cycle) => (
               <div
