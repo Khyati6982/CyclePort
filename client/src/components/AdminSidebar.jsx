@@ -1,90 +1,67 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { logout } from '../redux/slices/authSlice'
-import { FiLogOut, FiSun, FiMoon } from 'react-icons/fi'
-import { useTheme } from './ThemeProvider'
-import { toast } from 'react-toastify'
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../redux/slices/authSlice';
+import { FiLogOut, FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from './ThemeProvider';
+import { toast } from 'react-toastify';
 
-function AdminSidebar() {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const { theme, toggleTheme } = useTheme()
-  const { user } = useSelector((state) => state.auth)
+function AdminSidebar({ onLogout, onLinkClick }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
+  const { user } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logout())
-    toast.success('Admin logged out successfully.', { className: 'toastSuccess' })
-    navigate('/login')
-  }
+    try {
+      dispatch(logout());
+      toast.success('Admin logged out successfully.', { className: 'toastSuccess' });
+      navigate('/login');
+    } catch (err) {
+      toast.error('Logout failed. Please try again.');
+    }
+  };
 
   return (
-   <aside className="adminSidebar w-full md:w-64 flex-shrink-0 flex flex-col justify-between p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md rounded max-h-screen overflow-y-auto">
+    <aside
+      className="w-64 h-full flex flex-col justify-between p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
+      aria-label="Admin sidebar navigation"
+    >
       <div>
         {/* Admin Identity Block */}
         <div className="flex items-center gap-3 mb-6">
           <img
             src={user?.avatar || '/images/admin-avatar.jpg'}
-            alt="Admin Avatar"
+            alt={`${user?.name || 'Admin'} Avatar`}
             className="w-10 h-10 rounded-full object-cover border"
           />
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Logged in as</p>
-            <h3 className="text-base font-semibold text-[var(--color-teal-500)]">{user?.name || 'Admin'}</h3>
+            <h3 className="text-base font-semibold text-[var(--color-teal-500)]">
+              {user?.name || 'Admin'}
+            </h3>
           </div>
         </div>
 
         <h2 className="text-xl font-bold mb-6 text-[var(--color-teal-600)]">Admin Panel</h2>
         <ul className="space-y-4">
-          <li>
-            <NavLink
-              to="/admin/dashboard"
-              className={({ isActive }) =>
-                isActive ? 'adminLink active' : 'adminLink'
-              }
-            >
-              Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/admin/products"
-              className={({ isActive }) =>
-                isActive ? 'adminLink active' : 'adminLink'
-              }
-            >
-              Manage Products
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/admin/add-product"
-              className={({ isActive }) =>
-                isActive ? 'adminLink active' : 'adminLink'
-              }
-            >
-              Add Product
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/admin/orders"
-              className={({ isActive }) =>
-                isActive ? 'adminLink active' : 'adminLink'
-              }
-            >
-              Orders
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/admin/users"
-              className={({ isActive }) =>
-                isActive ? 'adminLink active' : 'adminLink'
-              }
-            >
-              Users
-            </NavLink>
-          </li>
+          {[
+            { to: '/admin/dashboard', label: 'Dashboard' },
+            { to: '/admin/products', label: 'Manage Products' },
+            { to: '/admin/add-product', label: 'Add Product' },
+            { to: '/admin/orders', label: 'Orders' },
+            { to: '/admin/users', label: 'Users' },
+          ].map((link) => (
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                className={({ isActive }) => (isActive ? 'adminLink active' : 'adminLink')}
+                aria-label={`Navigate to ${link.label}`}
+                onClick={onLinkClick} 
+              >
+                {link.label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </div>
 
@@ -106,7 +83,7 @@ function AdminSidebar() {
         </button>
       </div>
     </aside>
-  )
+  );
 }
 
-export default AdminSidebar
+export default AdminSidebar;

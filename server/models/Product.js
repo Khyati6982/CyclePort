@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 
+// Review schema
 const reviewSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,15 +21,9 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-  },
-})
+}, { timestamps: true })
 
+// Product schema
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -38,6 +33,7 @@ const productSchema = new mongoose.Schema({
   slug: {
     type: String,
     unique: true,
+    index: true,
     trim: true,
   },
   description: {
@@ -75,18 +71,20 @@ const productSchema = new mongoose.Schema({
   rating: {
     type: Number,
     default: 0,
+    min: 0,
   },
   numReviews: {
     type: Number,
     default: 0,
+    min: 0,
   },
   reviews: [reviewSchema],
   specs: {
-    frame: String,
-    wheels: String,
-    weight: String,
-    terrain: String,
-    electric: Boolean,
+    frame: { type: String, default: '' },  
+    wheels: { type: String, default: '' },
+    weight: { type: String, default: '' },
+    terrain: { type: String, default: '' },
+    electric: { type: Boolean, default: false },
   },
 }, { timestamps: true })
 

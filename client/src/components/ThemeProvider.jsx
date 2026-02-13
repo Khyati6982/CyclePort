@@ -1,35 +1,49 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from "react";
 
-const ThemeContext = createContext()
+const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  // Detect system preference safely
+  const prefersDark =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
 
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light')
-  })
+    try {
+      return (
+        localStorage.getItem("theme") || (prefersDark ? "dark" : "light")
+      );
+    } catch {
+      return prefersDark ? "dark" : "light";
+    }
+  });
 
   useEffect(() => {
-    const root = document.documentElement
-    const isDark = theme === 'dark'
+    const root = document.documentElement;
+    const isDark = theme === "dark";
 
-    root.classList.toggle('dark', isDark)
-    root.classList.toggle('light', !isDark)
-    root.setAttribute('data-theme', isDark ? 'dark' : 'light')
-    localStorage.setItem('theme', theme)
-  }, [theme])
+    root.classList.toggle("dark", isDark);
+    root.classList.toggle("light", !isDark);
+    root.setAttribute("data-theme", isDark ? "dark" : "light");
+
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {
+      console.warn("Unable to persist theme in localStorage.");
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
-  )
+  );
 }
 
 export function useTheme() {
-  return useContext(ThemeContext)
+  return useContext(ThemeContext);
 }

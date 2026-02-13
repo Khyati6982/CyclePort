@@ -1,13 +1,20 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
 import SessionManager from "./components/SessionManager";
 import ScrollToTop from "./components/ScrollToTop";
 import Layout from "./components/Layout";
+import AdminLayout from "./components/AdminLayout";
+import ComparePanel from "./components/compare/ComparePanel";
 import { Welcome } from "./pages/Welcome";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import PrivateRoute from "./routes/PrivateRoute";
-import AdminRoute from "./routes/AdminRoute";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import ProductDetails from "./pages/user/ProductDetails";
 import Cart from "./pages/user/Cart";
@@ -23,19 +30,14 @@ import ProductList from "./pages/admin/ProductList";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminLayout from "./components/AdminLayout";
-import ForgotPassword from "./pages/user/ForgotPassword";
-import ResetPassword from "./pages/user/ResetPassword";
-import ComparePanel from "./components/compare/ComparePanel";
-import { ToastContainer } from "react-toastify";
+import PrivateRoute from "./routes/PrivateRoute";
+import AdminRoute from "./routes/AdminRoute";
+
+import { useTheme } from "./components/ThemeProvider";
+import { setCompareList } from "./redux/slices/compareSlice";
+
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import { useTheme } from "./components/ThemeProvider";
-import { useDispatch, useSelector } from "react-redux";
-import { setCompareList } from "./redux/slices/compareSlice";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
-
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -46,11 +48,15 @@ function App() {
 
   // Hydrate compare list only for guests
   useEffect(() => {
-    const storedCompare = localStorage.getItem("compareItems");
-    const token = localStorage.getItem("token");
+    try {
+      const storedCompare = localStorage.getItem("compareItems");
+      const token = localStorage.getItem("token");
 
-    if (storedCompare && !token) {
-      dispatch(setCompareList(JSON.parse(storedCompare)));
+      if (storedCompare && !token) {
+        dispatch(setCompareList(JSON.parse(storedCompare)));
+      }
+    } catch {
+      console.warn("Failed to hydrate compare list from localStorage.");
     }
   }, [dispatch]);
 
@@ -73,56 +79,64 @@ function App() {
   }
 
   return (
-    <>
-      <BrowserRouter>
-        <SessionManager />
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Welcome />} />
-            <Route path="register" element={<Register />} />
-            <Route path="login" element={<Login />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-            <Route path="reset-password/:email" element={<ResetPassword />} />
-            <Route path="products" element={<UserProductList />} />
-            <Route path="products/:id" element={<ProductDetails />} />
-            <Route path="compare" element={<ComparePage />} />
+    <BrowserRouter>
+      <SessionManager />
+      <ScrollToTop />
 
-            <Route element={<PrivateRoute />}>
-              <Route path="profile" element={<Profile />} />
-              <Route path="cart" element={<Cart />} />
-              <Route path="checkout" element={<Checkout />} />
-              <Route path="payment" element={<Payment />} />
-              <Route path="payment-success" element={<PaymentSuccess />} />
-              <Route path="payment-cancel" element={<PaymentCancel />} />
-            </Route>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Welcome />} />
+          <Route path="register" element={<Register />} />
+          <Route path="login" element={<Login />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password/:email" element={<ResetPassword />} />
+          <Route path="products" element={<UserProductList />} />
+          <Route path="products/:id" element={<ProductDetails />} />
+          <Route path="compare" element={<ComparePage />} />
+
+          {/* Private Routes */}
+          <Route element={<PrivateRoute />}>
+            <Route path="profile" element={<Profile />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="payment" element={<Payment />} />
+            <Route path="payment-success" element={<PaymentSuccess />} />
+            <Route path="payment-cancel" element={<PaymentCancel />} />
           </Route>
+        </Route>
 
-          <Route element={<AdminRoute />}>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/products" element={<ProductList />} />
-              <Route path="/admin/add-product" element={<AddProduct />} />
-              <Route path="/admin/edit-product/:id" element={<EditProduct />} />
-              <Route path="/admin/orders" element={<AdminOrders />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-            </Route>
+        {/* Admin Routes */}
+        <Route element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/products" element={<ProductList />} />
+            <Route path="/admin/add-product" element={<AddProduct />} />
+            <Route path="/admin/edit-product/:id" element={<EditProduct />} />
+            <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
           </Route>
-        </Routes>
+        </Route>
+      </Routes>
 
-        <ComparePanel />
+      <ComparePanel />
 
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-          draggable
-          theme={theme}
-        />
-      </BrowserRouter>
-    </>
+      {/* Toast Notifications */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme={theme}
+      />
+
+      {/* Stripe Context (optional wrap for payment routes) */}
+      <Elements stripe={stripePromise}>
+        {/* Payment-related components can be wrapped here if needed */}
+      </Elements>
+    </BrowserRouter>
   );
 }
 

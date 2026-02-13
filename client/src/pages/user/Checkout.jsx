@@ -4,33 +4,49 @@ import { useNavigate } from "react-router-dom";
 import { FiCreditCard } from "react-icons/fi";
 
 const Checkout = () => {
-  const cart = useSelector((state) => state.cart.items);
+  const cart = useSelector((state) => state.cart.items || []);
   const navigate = useNavigate();
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
 
   const getTotal = () => {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
   const handlePayment = () => {
+    if (cart.length === 0) {
+      toast.error("Your cart is empty. Add items before checkout.");
+      navigate("/products");
+      return;
+    }
     toast.success("Redirecting to payment...");
     navigate("/payment");
   };
 
   if (cart.length === 0) {
     return (
-      <div className="text-center mt-10">
-        <p className="text-lg text-[var(--color-charcoal-700)]">
+      <div className="text-center mt-10 space-y-3">
+        <p className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
           Your cart is empty.
         </p>
+        <button
+          onClick={() => navigate("/products")}
+          className="btnPrimary mt-2 cursor-pointer"
+        >
+          Explore Cycles
+        </button>
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto mt-10 space-y-6">
-      <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">
-        Checkout
-      </h2>
+      <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">Checkout</h2>
 
       {cart.map((item) => (
         <div
@@ -39,19 +55,25 @@ const Checkout = () => {
           aria-label={`Checkout item: ${item.name}`}
         >
           <div>
-            <h3 className="font-semibold">{item.name}</h3>
+            <h3 className="font-semibold">{item.name || "Unnamed Product"}</h3>
             <p className="text-sm text-[var(--color-charcoal-700)]">
-              {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+              {item.category
+                ? item.category.charAt(0).toUpperCase() + item.category.slice(1)
+                : "Uncategorized"}
             </p>
             <p className="mt-1">
-              ₹{item.price} × {item.quantity}
+              {formatCurrency(item.price)} × {item.quantity}
             </p>
           </div>
-          <div className="font-bold">₹{item.price * item.quantity}</div>
+          <div className="font-bold">
+            {formatCurrency(item.price * item.quantity)}
+          </div>
         </div>
       ))}
 
-      <div className="text-right font-bold text-lg">Total: ₹{getTotal()}</div>
+      <div className="text-right font-bold text-lg">
+        Total: {formatCurrency(getTotal())}
+      </div>
 
       <div className="flex flex-col md:flex-row gap-4 mt-20 justify-center">
         <button

@@ -2,27 +2,35 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../utils/axios";
 import isEqual from "lodash.isequal";
 
+// Fetch products with optional filters
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async (filters = {}, { rejectWithValue }) => {
     try {
       const query = new URLSearchParams(filters).toString();
       const { data } = await axios.get(`/api/products?${query}`);
-      return data;
+      return data.products || [];
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch products");
+      console.error("Fetch products error:", err?.message || err);
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch products"
+      );
     }
   }
 );
 
+// Fetch single product by ID
 export const fetchSingleProduct = createAsyncThunk(
   "products/fetchSingleProduct",
   async (id, { rejectWithValue }) => {
     try {
       const { data } = await axios.get(`/api/products/${id}`);
-      return data;
+      return data.product || null;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Failed to fetch product");
+      console.error("Fetch single product error:", err?.message || err);
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch product"
+      );
     }
   }
 );
@@ -37,7 +45,9 @@ const productSlice = createSlice({
   },
   reducers: {
     setProducts: (state, action) => {
-      state.products = action.payload;
+      state.products = Array.isArray(action.payload)
+        ? action.payload
+        : state.products;
     },
     clearSelectedProduct: (state) => {
       state.selectedProduct = null;
@@ -46,6 +56,7 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Products
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -58,8 +69,10 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch products";
       })
+
+      // Fetch Single Product
       .addCase(fetchSingleProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -71,7 +84,7 @@ const productSlice = createSlice({
       })
       .addCase(fetchSingleProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch product";
       });
   },
 });

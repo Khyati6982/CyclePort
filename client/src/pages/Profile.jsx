@@ -20,6 +20,9 @@ const Profile = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [nameValid, setNameValid] = useState(true);
+  const [emailValid, setEmailValid] = useState(true);
+
   useEffect(() => {
     if (user) {
       setName(user.name);
@@ -27,6 +30,15 @@ const Profile = () => {
       setAvatar(user.avatar);
     }
   }, [user]);
+
+  const validateName = (value) => {
+    setNameValid(value.trim().length >= 2);
+  };
+
+  const validateEmail = (value) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    setEmailValid(regex.test(value.trim()));
+  };
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -46,31 +58,74 @@ const Profile = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (password && password !== confirmPassword) {
-      toast.error('Passwords do not match.');
-      return;
-    }
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('email', email);
-    if (password) formData.append('password', password);
-    if (avatar) formData.append('avatar', avatar);
+  // Prevent empty updates
+  if (
+    name === user.name &&
+    email === user.email &&
+    !password &&
+    avatar === user.avatar
+  ) {
+    toast.info("No changes detected.");
+    setIsEditing(false);
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const { data } = await axios.put('/api/auth/profile', formData);
-      dispatch(setUser(data.user));
-      toast.success('Profile updated successfully!');
-      setPassword('');
-      setConfirmPassword('');
-      setIsEditing(false);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Update failed');
-    } finally {
-      setLoading(false);
+  if (!nameValid || !emailValid) {
+    toast.error("Please fix validation errors.");
+    return;
+  }
+
+  if (password && password !== confirmPassword) {
+    toast.error("Passwords do not match.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("email", email);
+  if (password) formData.append("password", password);
+  if (avatar) formData.append("avatar", avatar);
+
+  setLoading(true);
+  try {
+    const { data } = await axios.put("/api/auth/profile", formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`, // ✅ ensure JWT is sent
+      },
+    });
+
+    // Normalize avatar before dispatch
+    const normalizedUser = {
+      ...data.user,
+      avatar: data.user.avatar?.startsWith("/uploads")
+        ? `${import.meta.env.VITE_API_URL}${data.user.avatar}`
+        : data.user.avatar || "/default-avatar.png",
+    };
+
+    dispatch(setUser(normalizedUser));
+    toast.success("Profile updated successfully!");
+    setPassword("");
+    setConfirmPassword("");
+    setIsEditing(false);
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Update failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const handleCancel = () => {
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+      setAvatar(user.avatar);
     }
+    setPassword('');
+    setConfirmPassword('');
+    setIsEditing(false);
   };
 
   if (!user) {
@@ -81,11 +136,17 @@ const Profile = () => {
     );
   }
 
+  const userAvatarPath = user?.avatar?.startsWith("/uploads")
+    ? `${import.meta.env.VITE_API_URL}${user.avatar}`
+    : user?.avatar || "/default-avatar.png";
+
+  const avatarPath = avatar?.startsWith("/uploads")
+    ? `${import.meta.env.VITE_API_URL}${avatar}`
+    : avatar || "/default-avatar.png";
+
   return (
-    <div
-      className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]"
-      aria-label="User Profile Section"
-    >
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]"
+         aria-label="User Profile Section">
       <h2 className="text-xl font-bold mb-6 text-[var(--color-teal-500)] flex items-center gap-2">
         <FiUser /> Your Profile
       </h2>
@@ -93,7 +154,7 @@ const Profile = () => {
       {!isEditing ? (
         <>
           <div className="flex justify-center mb-4">
-            <Avatar src={user?.avatar} className="w-20 h-20" />
+            <Avatar src={userAvatarPath} className="w-20 h-20" />
           </div>
 
           <p className="text-md text-[var(--color-charcoal-700)] dark:text-white text-center">
@@ -112,36 +173,7 @@ const Profile = () => {
         </>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex justify-center mb-4">
-            <Avatar src={avatar || user?.avatar} className="w-20 h-20" />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-[var(--color-charcoal-700)] dark:text-white">
-              Name:
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="inputField"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-[var(--color-charcoal-700)] dark:text-white">
-              Email:
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="inputField"
-              required
-            />
-          </div>
-
+          {/* Password fields */}
           <div>
             <label className="block font-semibold text-[var(--color-charcoal-700)] dark:text-white">
               New Password:
@@ -153,6 +185,7 @@ const Profile = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="inputField pr-10"
                 placeholder="Leave blank to keep current password"
+                disabled={loading}
               />
               <button
                 type="button"
@@ -177,6 +210,7 @@ const Profile = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="inputField pr-10"
                 placeholder="Confirm new password"
+                disabled={loading}
               />
               <button
                 type="button"
@@ -190,6 +224,7 @@ const Profile = () => {
             </div>
           </div>
 
+          {/* Profile Image Upload */}
           <div>
             <label className="block font-semibold text-[var(--color-charcoal-700)] dark:text-white">
               Profile Image:
@@ -199,9 +234,11 @@ const Profile = () => {
               accept="image/*"
               onChange={handleImageChange}
               className="inputField cursor-pointer"
+              disabled={loading}
             />
           </div>
 
+          {/* Buttons */}
           <div className="flex gap-4 mt-4">
             <button
               type="submit"
@@ -213,7 +250,7 @@ const Profile = () => {
 
             <button
               type="button"
-              onClick={() => setIsEditing(false)}
+              onClick={handleCancel}
               className="px-4 py-2 rounded bg-gray-100 text-gray-800 hover:bg-gray-200 transition flex items-center gap-2 cursor-pointer"
             >
               Cancel

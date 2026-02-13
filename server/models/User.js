@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minLength: 6,
+    minlength: 6,
+    select: false,
   },
   role: {
     type: String,
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: '/images/default-avatar.png',
+    default: '/uploads/profile/default-avatar.png',
   },
   isActive: {
     type: Boolean,

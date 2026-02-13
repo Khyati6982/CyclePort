@@ -17,7 +17,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const validateEmail = (value) => {
-    const regex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/; // more flexible
     setEmailValid(regex.test(value.trim()));
   };
 
@@ -49,10 +49,12 @@ const Login = () => {
 
       toast.success(data.message, { className: "toastSuccess" });
 
-      dispatch(setUser({
-        user: data.user,
-        token: data.token,
-      }));
+      dispatch(
+        setUser({
+          user: data.user,
+          token: data.token,
+        }),
+      );
 
       navigate(data.user.role === "admin" ? "/admin/dashboard" : "/");
     } catch (err) {
@@ -73,6 +75,7 @@ const Login = () => {
         <h2 className="formTitle flex items-center gap-2 text-[var(--color-teal-500)]">
           <FiLogIn /> Login to CyclePort
         </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -88,10 +91,11 @@ const Login = () => {
               email.length === 0
                 ? ""
                 : emailValid
-                ? "border-green-500"
-                : "border-red-500"
+                  ? "border-green-500"
+                  : "border-red-500"
             }`}
             required
+            disabled={loading}
           />
           {!emailValid && (
             <p id="emailError" className="text-red-500 text-sm mb-2">
@@ -114,10 +118,11 @@ const Login = () => {
                 password.length === 0
                   ? ""
                   : passwordValid
-                  ? "border-green-500"
-                  : "border-red-500"
+                    ? "border-green-500"
+                    : "border-red-500"
               }`}
               required
+              disabled={loading}
             />
             <button
               type="button"
@@ -138,13 +143,14 @@ const Login = () => {
 
           <button
             type="submit"
-            className="formButton w-full cursor-pointer"
+            className="btnPrimary w-full cursor-pointer flex items-center justify-center gap-2"
             disabled={loading}
             aria-label="Submit login form"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+
         <div className="text-right mt-2">
           <Link
             to="/forgot-password"
@@ -154,6 +160,7 @@ const Login = () => {
             Forgot Password?
           </Link>
         </div>
+
         <Link
           to="/register"
           className="formLink"

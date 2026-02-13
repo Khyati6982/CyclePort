@@ -72,6 +72,13 @@ const Cart = () => {
     toast.info(`${name} removed from cart.`);
   };
 
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+
   const getTotal = () => {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
@@ -124,7 +131,7 @@ const Cart = () => {
               {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
             </p>
             <p className="mt-1">
-              ₹{item.price} × {item.quantity}
+              {formatCurrency(item.price)} × {item.quantity}
             </p>
             {(() => {
               if (item.countInStock === 0) {
@@ -187,7 +194,9 @@ const Cart = () => {
         </div>
       ))}
 
-      <div className="text-right font-bold text-lg">Total: ₹{getTotal()}</div>
+      <div className="text-right font-bold text-lg">
+        Total: {formatCurrency(getTotal())}
+      </div>
 
       <button
         onClick={handleCheckout}

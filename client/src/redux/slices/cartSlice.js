@@ -8,9 +8,10 @@ const loadCartFromStorage = () => {
     const currentUser = JSON.parse(localStorage.getItem("user"));
     const currentUserId = currentUser?._id;
 
+    // Purge cart if user mismatch
     if (!storedUserId || storedUserId !== currentUserId) {
-      localStorage.removeItem("cart"); // mismatch → purge
-      localStorage.removeItem("cartUserId"); // optional double-check
+      localStorage.removeItem("cart");
+      localStorage.removeItem("cartUserId");
       return [];
     }
 
@@ -31,9 +32,7 @@ const cartSlice = createSlice({
   },
   reducers: {
     addToCart: (state, action) => {
-      const exists = state.items.find(
-        (item) => item._id === action.payload._id
-      );
+      const exists = state.items.find((item) => item._id === action.payload._id);
       if (!exists) {
         state.items.push({ ...action.payload, quantity: 1 });
         saveCartToStorage(state.items);
@@ -54,23 +53,13 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
       localStorage.removeItem("cart");
-      localStorage.removeItem("cartUserId"); // reset binding
+      localStorage.removeItem("cartUserId");
     },
     setCart: (state, action) => {
       state.items = action.payload;
       saveCartToStorage(state.items);
     },
-    mergeGuestCart: (state) => {
-      const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
-      guestCart.forEach((guestItem) => {
-        const exists = state.items.find((item) => item._id === guestItem._id);
-        if (!exists) {
-          state.items.push(guestItem);
-        }
-      });
-      saveCartToStorage(state.items);
-      localStorage.removeItem("guestCart");
-    },
+    // 🚫 mergeGuestCart removed — no guest carts allowed
   },
 });
 
@@ -80,7 +69,6 @@ export const {
   updateQuantity,
   clearCart,
   setCart,
-  mergeGuestCart,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

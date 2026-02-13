@@ -17,7 +17,7 @@ const PaymentSuccess = () => {
         Thank you for your purchase! Your order has been confirmed.
       </p>
       <p className="text-sm text-[var(--color-charcoal-500)] dark:text-[var(--color-charcoal-300)]">
-        You’ll receive a confirmation email shortly.
+        You’ll receive a confirmation email shortly with your order details.
       </p>
       <div className="flex justify-center">
         <button

@@ -11,16 +11,29 @@ const SessionManager = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (token && !user) {
       dispatch(fetchProfile())
         .unwrap()
         .catch((err) => {
-          toast.error("Session expired. Please log in again.");
+          console.error("SessionManager error:", err?.message || err);
+          toast.error("Session expired. Please log in again.", {
+            className: "toastError",
+          });
+
+          // Clear session safely
           setTimeout(() => {
             dispatch(logout());
+            localStorage.removeItem("token");
             navigate("/login");
           }, 1500);
         });
+    }
+
+    if (!token && user) {
+      // If token is missing but user exists in state, force logout
+      dispatch(logout());
+      navigate("/login");
     }
   }, [dispatch, user, navigate]);
 

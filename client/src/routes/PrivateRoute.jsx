@@ -1,16 +1,25 @@
-import { Navigate, Outlet } from 'react-router-dom'
-import { useSelector, shallowEqual } from 'react-redux'
+import { Navigate, Outlet } from "react-router-dom";
+import { useSelector, shallowEqual } from "react-redux";
 
 const PrivateRoute = () => {
-  const { user, token, isLoading } = useSelector((state) => state.auth, shallowEqual)
+  const { user, token, isLoading } = useSelector(
+    (state) => state.auth,
+    shallowEqual
+  );
 
+  // Show loader while auth state is being resolved
   if (isLoading) {
-    return <div className="text-center py-10">Loading...</div>
+    return <div className="text-center py-10">Loading...</div>;
   }
 
-  const isAuthenticated = user && token
+  const isAuthenticated = Boolean(user && token);
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />
-}
+  // Redirect unauthenticated users to login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
-export default PrivateRoute
+  return <Outlet />;
+};
+
+export default PrivateRoute;

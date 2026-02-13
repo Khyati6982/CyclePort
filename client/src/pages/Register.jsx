@@ -23,7 +23,7 @@ const Register = () => {
   }
 
   const validateEmail = (value) => {
-    const regex = /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z]+\.[a-zA-Z]{2,}$/
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/ // more flexible
     setEmailValid(regex.test(value.trim()))
   }
 
@@ -54,9 +54,15 @@ const Register = () => {
         email: trimmedEmail,
         password: trimmedPassword,
       })
+
       toast.success(data.message, { className: 'toastSuccess' })
-      localStorage.setItem('token', data.token)
-      dispatch(setUser(data.user))
+
+      // Store both user and token for consistency
+      dispatch(setUser({
+        user: data.user,
+        token: data.token,
+      }))
+
       setName('')
       setEmail('')
       setPassword('')
@@ -74,6 +80,7 @@ const Register = () => {
         <h2 className="formTitle flex items-center gap-2 text-[var(--color-teal-500)]">
           <FiUserPlus /> Create Your CyclePort Account
         </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4 relative">
           <input
             type="text"
@@ -87,6 +94,7 @@ const Register = () => {
             onBlur={(e) => validateName(e.target.value)}
             className={`formInput ${name.length === 0 ? '' : nameValid ? 'border-green-500' : 'border-red-500'}`}
             required
+            disabled={loading}
           />
           {!nameValid && (
             <p id="nameError" className="text-red-500 text-sm mb-2">
@@ -101,11 +109,12 @@ const Register = () => {
             autoComplete="email"
             aria-label="Email"
             aria-invalid={!emailValid}
-            aria-describedby="emailError"
+                        aria-describedby="emailError"
             onChange={(e) => setEmail(e.target.value)}
             onBlur={(e) => validateEmail(e.target.value)}
             className={`formInput ${email.length === 0 ? '' : emailValid ? 'border-green-500' : 'border-red-500'}`}
             required
+            disabled={loading}
           />
           {!emailValid && (
             <p id="emailError" className="text-red-500 text-sm mb-2">
@@ -126,16 +135,19 @@ const Register = () => {
               onBlur={(e) => validatePassword(e.target.value)}
               className={`formInput pr-10 ${password.length === 0 ? '' : passwordValid ? 'border-green-500' : 'border-red-500'}`}
               required
+              disabled={loading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2 text-xl"
+              className="absolute right-3 top-1/2 -translate-y-6 text-xl cursor-pointer"
               aria-label="Toggle password visibility"
+              title={showPassword ? 'Hide Password' : 'Show Password'}
             >
               {showPassword ? '🙈' : '🐵'}
             </button>
           </div>
+
           {!passwordValid && (
             <p id="passwordError" className="text-red-500 text-sm mb-2">
               Password must be at least 6 characters
@@ -144,13 +156,14 @@ const Register = () => {
 
           <button
             type="submit"
-            className="formButton w-full"
+            className="btnPrimary w-full cursor-pointer flex items-center justify-center gap-2"
             disabled={loading}
             aria-label="Submit registration form"
           >
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
+
         <Link to="/login" className="formLink" aria-label="Go to login page">
           Already have an account? Login
         </Link>

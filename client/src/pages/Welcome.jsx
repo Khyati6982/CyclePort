@@ -41,21 +41,28 @@ export function Welcome() {
           Featured Cycles
         </h2>
         {featuredCycles.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {featuredCycles.map((cycle) => (
               <div
                 key={cycle._id}
                 className="min-w-[220px] h-full bg-white dark:bg-gray-900 p-4 rounded shadow hover:shadow-lg hover:scale-[1.01] transition-transform flex flex-col items-center text-center"
               >
-                <img
-                  src={
-                    cycle.image?.startsWith("/uploads")
-                      ? `http://localhost:4000${cycle.image}`
-                      : cycle.image
-                  }
-                  alt={`Image of ${cycle.name}`}
-                  className="h-32 w-full object-contain rounded mb-2"
-                />
+                {cycle.image ? (
+                  <img
+                    src={
+                      cycle.image.startsWith("/uploads")
+                        ? `${import.meta.env.VITE_API_URL}${cycle.image}`
+                        : cycle.image
+                    }
+                    alt={`Image of ${cycle.name}`}
+                    className="h-32 w-full object-contain rounded mb-2"
+                  />
+                ) : (
+                  <div className="h-32 w-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded mb-2 text-gray-500 dark:text-gray-400 text-sm">
+                    No image found
+                  </div>
+                )}
+
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                   {cycle.name}
                 </h3>
@@ -147,8 +154,8 @@ function TrustItem({ emoji, title, desc }) {
 
 function QuickLink({ href, title, desc }) {
   return (
-    <a
-      href={href}
+    <Link
+      to={href}
       className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow hover:shadow-xl hover:scale-[1.01] transition-transform flex flex-col items-center text-center"
       aria-label={title}
     >
@@ -156,6 +163,6 @@ function QuickLink({ href, title, desc }) {
         {title}
       </h3>
       <p className="text-base text-gray-500 dark:text-gray-400">{desc}</p>
-    </a>
+    </Link>
   );
 }

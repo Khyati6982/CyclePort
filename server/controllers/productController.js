@@ -1,105 +1,116 @@
-import Product from '../models/Product.js';
-import slugify from 'slugify';
+import Product from '../models/Product.js'
+import slugify from 'slugify'
+
+// GET /api/products/featured
+export const getFeaturedProducts = async (req, res, next) => {
+  try {
+    // Find products where featured = true
+    const products = await Product.find({ featured: true });
+
+    res.status(200).json({ products });
+  } catch (err) {
+    next(err);
+  }
+};
 
 // GET /api/products/categories
-export const getCategories = async (req, res) => {
+export const getCategories = async (req, res, next) => {
   try {
-    const categories = await Product.distinct('category');
-    res.json(categories);
+    const categories = await Product.distinct('category')
+    res.status(200).json({ categories })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch categories.' });
+    next(err)
   }
-};
+}
 
 // GET /api/products/price-range
-export const getPriceRange = async (req, res) => {
+export const getPriceRange = async (req, res, next) => {
   try {
-    const prices = await Product.find().select('price');
-    const priceValues = prices.map(p => p.price);
-    const minPrice = Math.min(...priceValues);
-    const maxPrice = Math.max(...priceValues);
-    res.json({ minPrice, maxPrice });
+    const prices = await Product.find().select('price')
+    const priceValues = prices.map(p => p.price)
+    const minPrice = Math.min(...priceValues)
+    const maxPrice = Math.max(...priceValues)
+    res.status(200).json({ minPrice, maxPrice })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch price range.' });
+    next(err)
   }
-};
+}
 
 // GET /api/products
-export const getFilteredProducts = async (req, res) => {
+export const getFilteredProducts = async (req, res, next) => {
   try {
-    const { category, minPrice, maxPrice, name } = req.query;
-    const query = {};
+    const { category, minPrice, maxPrice, name } = req.query
+    const query = {}
 
     if (name?.trim()) {
-      query.name = { $regex: name.trim(), $options: 'i' };
+      query.name = { $regex: name.trim(), $options: 'i' }
     }
 
     if (category?.trim()) {
-      const categories = category.split(',').map(c => c.trim());
-      query.category = { $in: categories };
+      const categories = category.split(',').map(c => c.trim())
+      query.category = { $in: categories }
     }
 
-    const min = Number(minPrice);
-    const max = Number(maxPrice);
+    const min = Number(minPrice)
+    const max = Number(maxPrice)
 
     if (!isNaN(min) || !isNaN(max)) {
-      query.price = {};
-      if (!isNaN(min)) query.price.$gte = min;
-      if (!isNaN(max)) query.price.$lte = max;
+      query.price = {}
+      if (!isNaN(min)) query.price.$gte = min
+      if (!isNaN(max)) query.price.$lte = max
     }
 
-    const products = await Product.find(query);
-    res.json(products);
+    const products = await Product.find(query)
+    res.status(200).json({ products })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch filtered products.' });
+    next(err)
   }
-};
+}
 
 // GET /api/products/:id
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
     if (!product) {
-      return res.status(404).json({ message: 'Product not found.' });
+      const error = new Error('Product not found.')
+      error.statusCode = 404
+      throw error
     }
-    res.json(product);
+    res.status(200).json({ product })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch product.' });
+    next(err)
   }
-};
+}
 
 // POST /api/products
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res, next) => {
   try {
-    const {
-      name,
-      description,
-      image,
-      category,
-      price,
-      brand,
-      countInStock,
-      featured,
-      specs,
-    } = req.body;
+    const { name, description, image, category, price, brand, countInStock, featured, specs } = req.body
 
     if (!name || !price || !category || !brand) {
-      return res.status(400).json({ message: 'Missing required fields: name, price, category, brand.' });
+      const error = new Error('Missing required fields: name, price, category, brand.')
+      error.statusCode = 400
+      throw error
     }
 
     if (typeof price !== 'number' || price <= 0) {
-      return res.status(400).json({ message: 'Price must be a positive number.' });
+      const error = new Error('Price must be a positive number.')
+      error.statusCode = 400
+      throw error
     }
 
     if (countInStock !== undefined && (typeof countInStock !== 'number' || countInStock < 0)) {
-      return res.status(400).json({ message: 'countInStock must be a non-negative number.' });
+      const error = new Error('countInStock must be a non-negative number.')
+      error.statusCode = 400
+      throw error
     }
 
-    const slug = slugify(name, { lower: true, strict: true });
-
-    const existing = await Product.findOne({ slug });
+    const slug = slugify(name, { lower: true, strict: true })
+    const existing = await Product.findOne({ slug })
     if (existing) {
-      return res.status(409).json({ message: 'A product with this name already exists.' });
+      const error = new Error('A product with this name already exists.')
+      error.statusCode = 409
+      throw error
     }
 
     const newProduct = new Product({
@@ -113,172 +124,187 @@ export const createProduct = async (req, res) => {
       countInStock: countInStock ?? 0,
       featured: Boolean(featured),
       specs,
-    });
+    })
 
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
+    const savedProduct = await newProduct.save()
+    res.status(201).json({ product: savedProduct })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create product.' });
+    next(err)
   }
-};
+}
 
 // PUT /api/products/:id
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   try {
-    const {
-      name,
-      description,
-      image,
-      category,
-      price,
-      brand,
-      countInStock,
-      featured,
-      specs,
-    } = req.body;
+    const { name, description, image, category, price, brand, countInStock, featured, specs } = req.body
 
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
     if (!product) {
-      return res.status(404).json({ message: 'Product not found.' });
+      const error = new Error('Product not found.')
+      error.statusCode = 404
+      throw error
     }
 
     if (name) {
-      product.name = name;
-      product.slug = slugify(name, { lower: true, strict: true });
+      product.name = name
+      product.slug = slugify(name, { lower: true, strict: true })
     }
-    if (description) product.description = description;
-    if (image) product.image = image;
-    if (category) product.category = category;
-    if (price !== undefined && typeof price === 'number' && price > 0) product.price = price;
-    if (brand) product.brand = brand;
+    if (description) product.description = description
+    if (image) product.image = image
+    if (category) product.category = category
+    if (price !== undefined && typeof price === 'number' && price > 0) product.price = price
+    if (brand) product.brand = brand
     if (countInStock !== undefined && typeof countInStock === 'number' && countInStock >= 0) {
-      product.countInStock = countInStock;
+      product.countInStock = countInStock
     }
-    if (typeof featured === 'boolean') product.featured = featured;
-    if (specs) product.specs = specs;
+    if (typeof featured === 'boolean') product.featured = featured
+    if (specs) product.specs = specs
 
-    const updatedProduct = await product.save();
-    res.json({ product: updatedProduct });
+    const updatedProduct = await product.save()
+    res.status(200).json({ product: updatedProduct })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update product.' });
+    next(err)
   }
-};
+}
 
 // POST /api/products/:id/reviews
-export const addProductReview = async (req, res) => {
+export const addProductReview = async (req, res, next) => {
   try {
-    const { rating, comment } = req.body;
-    const productId = req.params.id;
-    const userId = req.user._id;
-    const userName = req.user.name;
+    const { rating, comment } = req.body
+    const productId = req.params.id
+    const userId = req.user._id
+    const userName = req.user.name
 
     if (!rating || typeof rating !== 'number' || rating < 1 || rating > 5) {
-      return res.status(400).json({ message: 'Rating must be a number between 1 and 5.' });
+      const error = new Error('Rating must be a number between 1 and 5.')
+      error.statusCode = 400
+      throw error
     }
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId)
     if (!product) {
-      return res.status(404).json({ message: 'Product not found.' });
+      const error = new Error('Product not found.')
+      error.statusCode = 404
+      throw error
     }
 
-    const alreadyReviewed = product.reviews.find(r => r.user.toString() === userId.toString());
+    const alreadyReviewed = product.reviews.find(r => r.user.toString() === userId.toString())
     if (alreadyReviewed) {
-      return res.status(400).json({ message: 'You have already reviewed this product.' });
+      const error = new Error('You have already reviewed this product.')
+      error.statusCode = 400
+      throw error
     }
 
-    const review = {
-      user: userId,
-      name: userName,
-      rating,
-      comment,
-    };
+    const review = { user: userId, name: userName, rating, comment }
+    product.reviews.push(review)
+    product.numReviews = product.reviews.length
+    product.rating = product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.numReviews
 
-    product.reviews.push(review);
-    product.numReviews = product.reviews.length;
-    product.rating = product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.numReviews;
-
-    await product.save();
-    res.status(201).json({ message: 'Review added successfully.' });
+    await product.save()
+    res.status(201).json({ message: 'Review added successfully.' })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to add review.' });
+    next(err)
   }
-};
+}
 
 // PUT /api/products/:id/reviews/:reviewId
-export const updateProductReview = async (req, res) => {
+export const updateProductReview = async (req, res, next) => {
   try {
-    const { id, reviewId } = req.params;
-    const { rating, comment } = req.body;
-    const userId = req.user._id;
+    const { id, reviewId } = req.params
+    const { rating, comment } = req.body
+    const userId = req.user._id
 
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ message: 'Product not found.' });
-
-    const review = product.reviews.id(reviewId);
-    if (!review) return res.status(404).json({ message: 'Review not found.' });
-
-    if (review.user.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'You can only edit your own review.' });
+    const product = await Product.findById(id)
+    if (!product) {
+      const error = new Error('Product not found.')
+      error.statusCode = 404
+      throw error
     }
 
-    if (rating) review.rating = rating;
-    if (comment) review.comment = comment;
-    review.updatedAt = new Date();
+    const review = product.reviews.id(reviewId)
+    if (!review) {
+      const error = new Error('Review not found.')
+      error.statusCode = 404
+      throw error
+    }
 
-    product.rating = product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length;
+    if (review.user.toString() !== userId.toString()) {
+      const error = new Error('You can only edit your own review.')
+      error.statusCode = 403
+      throw error
+    }
 
-    await product.save();
-    res.json({ message: 'Review updated successfully.' });
+    if (rating) review.rating = rating
+    if (comment) review.comment = comment
+    review.updatedAt = new Date()
+
+    product.rating = product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length
+
+    await product.save()
+    res.status(200).json({ message: 'Review updated successfully.' })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to update review.' });
+    next(err)
   }
-};
+}
 
 // DELETE /api/products/:id/reviews/:reviewId
-export const deleteProductReview = async (req, res) => {
+export const deleteProductReview = async (req, res, next) => {
   try {
-    const { id, reviewId } = req.params;
-    const userId = req.user._id;
+    const { id, reviewId } = req.params
+    const userId = req.user._id
 
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ message: 'Product not found.' });
-
-    const review = product.reviews.id(reviewId);
-    if (!review) return res.status(404).json({ message: 'Review not found.' });
-
-    if (review.user.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'You can only delete your own review.' });
+    const product = await Product.findById(id)
+    if (!product) {
+      const error = new Error('Product not found.')
+      error.statusCode = 404
+      throw error
     }
 
-    // Replace .remove() with array filtering
-    product.reviews = product.reviews.filter(r => r._id.toString() !== reviewId);
-    product.numReviews = product.reviews.length;
+    const review = product.reviews.id(reviewId)
+    if (!review) {
+      const error = new Error('Review not found.')
+      error.statusCode = 404
+      throw error
+    }
+
+    if (review.user.toString() !== userId.toString()) {
+      const error = new Error('You can only delete your own review.')
+      error.statusCode = 403
+      throw error
+    }
+
+    // Remove review safely
+    product.reviews = product.reviews.filter(r => r._id.toString() !== reviewId)
+    product.numReviews = product.reviews.length
     product.rating =
       product.numReviews > 0
         ? product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.numReviews
-        : 0;
+        : 0
 
-    await product.save();
-    res.json({ message: 'Review deleted successfully.' });
+    await product.save()
+    res.status(200).json({ message: 'Review deleted successfully.' })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to delete review.' });
+    next(err)
   }
-};
-
+}
 
 // GET /api/products/compare/specs?ids=abc123,def456
-export const getCompareSpecs = async (req, res) => {
+export const getCompareSpecs = async (req, res, next) => {
   try {
-    const ids = req.query.ids?.split(',').map(id => id.trim());
+    const ids = req.query.ids?.split(',').map(id => id.trim())
 
     if (!ids || ids.length < 2) {
-      return res.status(400).json({ message: 'Please provide at least two product IDs to compare.' });
+      const error = new Error('Please provide at least two product IDs to compare.')
+      error.statusCode = 400
+      throw error
     }
 
-    const products = await Product.find({ _id: { $in: ids } }).select('name image brand specs');
+    const products = await Product.find({ _id: { $in: ids } }).select('name image brand specs')
 
     if (products.length !== ids.length) {
-      return res.status(404).json({ message: 'One or more products not found.' });
+      const error = new Error('One or more products not found.')
+      error.statusCode = 404
+      throw error
     }
 
     const compareData = products.map(p => ({
@@ -287,10 +313,10 @@ export const getCompareSpecs = async (req, res) => {
       image: p.image,
       brand: p.brand,
       specs: p.specs,
-    }));
+    }))
 
-    res.json(compareData);
+    res.status(200).json({ compareData })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch comparison specs.' });
+    next(err)
   }
-};
+}

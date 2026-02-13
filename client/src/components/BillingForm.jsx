@@ -33,6 +33,13 @@ const BillingForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Basic validation before submission
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
     onSubmit(form);
   };
 
@@ -40,10 +47,12 @@ const BillingForm = ({ onSubmit }) => {
     <form
       onSubmit={handleSubmit}
       className="max-w-xl mx-auto mt-10 space-y-6 p-6 bg-white dark:bg-[var(--color-charcoal-900)] rounded-lg shadow-md"
+      aria-label="Billing form"
     >
       <h2 className="text-2xl font-bold text-[var(--color-teal-500)] mb-4">Billing Details</h2>
 
       <div className="space-y-4">
+        {/* Full Name */}
         <div>
           <label className="block text-sm font-medium mb-1 text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
             Full Name
@@ -59,6 +68,7 @@ const BillingForm = ({ onSubmit }) => {
           />
         </div>
 
+        {/* Email */}
         <div>
           <label className="block text-sm font-medium mb-1 text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
             Email
@@ -74,6 +84,7 @@ const BillingForm = ({ onSubmit }) => {
           />
         </div>
 
+        {/* Mobile Number */}
         <div>
           <label className="block text-sm font-medium mb-1 text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
             Mobile Number
@@ -86,9 +97,12 @@ const BillingForm = ({ onSubmit }) => {
             required
             className="inputField w-full"
             placeholder="Enter your mobile number"
+            pattern="[0-9]{10}"
+            title="Enter a valid 10-digit mobile number"
           />
         </div>
 
+        {/* Address Line 1 */}
         <div>
           <label className="block text-sm font-medium mb-1 text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
             Address Line 1
@@ -104,6 +118,7 @@ const BillingForm = ({ onSubmit }) => {
           />
         </div>
 
+        {/* City + Postal Code */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1 text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
@@ -132,12 +147,18 @@ const BillingForm = ({ onSubmit }) => {
               required
               className="inputField w-full"
               placeholder="PIN code"
+              pattern="[0-9]{6}"
+              title="Enter a valid 6-digit postal code"
             />
           </div>
         </div>
       </div>
 
-      <button type="submit" className="btnPrimary w-full mt-6 cursor-pointer">
+      <button
+        type="submit"
+        className="btnPrimary w-full mt-6 cursor-pointer"
+        aria-label="Continue to payment"
+      >
         Continue to Payment
       </button>
     </form>

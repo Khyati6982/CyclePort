@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { addToCart } from "../../redux/slices/cartSlice";
 import { fetchProducts } from "../../redux/slices/productSlice";
@@ -9,14 +9,9 @@ import CompareButton from "../../components/compare/CompareButton";
 
 const UserProductList = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const cart = useSelector((state) => state.cart.items);
+  const cart = useSelector((state) => state.cart.items || []);
   const { user } = useSelector((state) => state.auth);
-  const {
-    products = [],
-    loading,
-    error,
-  } = useSelector((state) => state.products);
+  const { products = [], loading, error } = useSelector((state) => state.products);
 
   const handleAddToCart = (product) => {
     if (!user) {
@@ -34,18 +29,23 @@ const UserProductList = () => {
     toast.success(`${product.name} added to cart!`);
   };
 
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+
   if (loading) {
-    return (
-      <p className="text-center mt-10 text-gray-500">Loading products...</p>
-    );
+    return <p className="text-center mt-10 text-gray-500">Loading products...</p>;
   }
 
   if (error) {
+    toast.dismiss();
+    toast.error(error, { className: "toastError" });
     return (
       <div className="text-center mt-10">
-        <p className="text-lg text-[var(--color-charcoal-700)]">
-          Failed to load products.
-        </p>
+        <p className="text-lg text-[var(--color-charcoal-700)]">Failed to load products.</p>
       </div>
     );
   }
@@ -75,7 +75,7 @@ const UserProductList = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => {
               const imagePath = product.image?.startsWith("/uploads")
-                ? `http://localhost:4000${product.image}`
+                ? `${import.meta.env.VITE_API_URL || ""}${product.image}`
                 : product.image;
 
               return (
@@ -86,22 +86,23 @@ const UserProductList = () => {
                 >
                   <img
                     src={imagePath}
-                    alt={`Image of ${product.name}`}
+                    alt={`Image of ${product.name || "product"}`}
                     className="w-full h-40 object-contain rounded mb-4 bg-white"
                   />
                   <h3 className="text-lg font-bold text-[var(--color-teal-500)]">
-                    {product.name}
+                    {product.name || "Unnamed Product"}
                   </h3>
                   <p className="text-sm text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
-                    {product.category.charAt(0).toUpperCase() +
-                      product.category.slice(1)}
+                    {product.category
+                      ? product.category.charAt(0).toUpperCase() + product.category.slice(1)
+                      : "Uncategorized"}
                   </p>
-                  <p className="text-md font-semibold mt-2">₹{product.price}</p>
+                  <p className="text-md font-semibold mt-2">
+                    {formatCurrency(product.price || 0)}
+                  </p>
 
                   {product.countInStock === 0 && (
-                    <p className="text-sm text-red-500 font-semibold mt-1">
-                      Out of Stock
-                    </p>
+                    <p className="text-sm text-red-500 font-semibold mt-1">Out of Stock</p>
                   )}
 
                   <Link
@@ -116,9 +117,7 @@ const UserProductList = () => {
                     onClick={() => handleAddToCart(product)}
                     disabled={product.countInStock === 0}
                     className={`btnPrimary w-full mt-4 flex items-center justify-center gap-2 cursor-pointer ${
-                      product.countInStock === 0
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
+                      product.countInStock === 0 ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                     aria-label={`Add ${product.name} to cart`}
                   >

@@ -12,7 +12,8 @@ const AdminDashboard = () => {
   const orders = useSelector((state) => state.orders?.allOrders || []);
   const loadingProducts = useSelector((state) => state.products?.loading || false);
   const loadingOrders = useSelector((state) => state.orders?.loading || false);
-  const error = useSelector((state) => state.orders?.error || null);
+  const productError = useSelector((state) => state.products?.error || null);
+  const orderError = useSelector((state) => state.orders?.error || null);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -20,15 +21,21 @@ const AdminDashboard = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error, { className: 'toastError' });
-    }
-  }, [error]);
+    if (productError) toast.error(productError, { className: 'toastError' });
+    if (orderError) toast.error(orderError, { className: 'toastError' });
+  }, [productError, orderError]);
 
   const totalRevenue = orders.reduce((sum, order) => {
     const total = typeof order.total === 'number' ? order.total : 0;
     return sum + total;
   }, 0);
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
 
   const recentOrders = orders.slice(0, 5);
 
@@ -43,20 +50,28 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-[var(--color-charcoal-800)] p-6 rounded shadow text-center transition-transform hover:scale-[1.02]">
           <FaBoxOpen className="text-4xl text-[var(--color-teal-500)] mx-auto mb-2" />
-          <h3 className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">Total Products</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">
+            Total Products
+          </h3>
           <p className="text-3xl font-bold text-[var(--color-teal-500)] mt-2">{products.length}</p>
         </div>
 
         <div className="bg-white dark:bg-[var(--color-charcoal-800)] p-6 rounded shadow text-center transition-transform hover:scale-[1.02]">
           <FaClipboardList className="text-4xl text-[var(--color-teal-500)] mx-auto mb-2" />
-          <h3 className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">Total Orders</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">
+            Total Orders
+          </h3>
           <p className="text-3xl font-bold text-[var(--color-teal-500)] mt-2">{orders.length}</p>
         </div>
 
         <div className="bg-white dark:bg-[var(--color-charcoal-800)] p-6 rounded shadow text-center transition-transform hover:scale-[1.02]">
           <FaRupeeSign className="text-4xl text-[var(--color-teal-500)] mx-auto mb-2" />
-          <h3 className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">Total Revenue</h3>
-          <p className="text-3xl font-bold text-[var(--color-teal-500)] mt-2">₹{totalRevenue}</p>
+          <h3 className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">
+            Total Revenue
+          </h3>
+          <p className="text-3xl font-bold text-[var(--color-teal-500)] mt-2">
+            {formatCurrency(totalRevenue)}
+          </p>
         </div>
       </div>
 
@@ -76,8 +91,10 @@ const AdminDashboard = () => {
                 {recentOrders.map((order) => (
                   <tr key={order._id} className="border-b">
                     <td className="py-2">#{order._id.slice(-6)}</td>
-                    <td className="py-2">₹{order.total}</td>
-                    <td className="py-2">{new Date(order.createdAt).toLocaleDateString('en-GB')}</td>
+                    <td className="py-2">{formatCurrency(order.total)}</td>
+                    <td className="py-2">
+                      {new Date(order.createdAt).toLocaleDateString('en-GB')}
+                    </td>
                   </tr>
                 ))}
               </tbody>

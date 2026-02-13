@@ -1,12 +1,12 @@
 const Avatar = ({ src, alt = 'User Avatar', className = '' }) => {
-  const fallback = '/images/default-avatar.png'
+  const fallback = '/images/default-avatar.png';
 
-  // If src starts with /uploads, prepend backend URL
+  // If src starts with /uploads, prepend backend URL from env
   const resolvedSrc = src?.startsWith('/uploads')
-    ? `http://localhost:4000${src}`
-    : src
+    ? `${import.meta.env.VITE_BACKEND_URL || ''}${src}`
+    : src;
 
-  const validSrc = resolvedSrc && resolvedSrc.trim() !== '' ? resolvedSrc : fallback
+  const validSrc = resolvedSrc && resolvedSrc.trim() !== '' ? resolvedSrc : fallback;
 
   return (
     <img
@@ -14,11 +14,12 @@ const Avatar = ({ src, alt = 'User Avatar', className = '' }) => {
       alt={alt}
       className={`rounded-full object-cover border ${className}`}
       onError={(e) => {
-        e.target.onerror = null
-        e.target.src = fallback
+        e.currentTarget.onerror = null;
+        e.currentTarget.src = fallback;
       }}
+      aria-label={alt}
     />
-  )
-}
+  );
+};
 
-export default Avatar
+export default Avatar;

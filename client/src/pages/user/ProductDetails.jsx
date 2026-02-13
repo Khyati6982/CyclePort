@@ -11,9 +11,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectedProduct, loading, error } = useSelector(
-    (state) => state.products
-  );
+  const { selectedProduct, loading, error } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.auth);
   const cart = useSelector((state) => state.cart.items);
 
@@ -51,7 +49,10 @@ const ProductDetails = () => {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!comment.trim()) return;
+    if (!comment.trim()) {
+      toast.error("Comment cannot be empty.");
+      return;
+    }
 
     try {
       if (editingReviewId) {
@@ -70,9 +71,7 @@ const ProductDetails = () => {
       setRating(5);
       setComment("");
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Not authorized. Please log in again."
-      );
+      toast.error(err.response?.data?.message || "Not authorized. Please log in again.");
     }
   };
 
@@ -92,80 +91,58 @@ const ProductDetails = () => {
     }
   };
 
-  if (loading)
-    return (
-      <p className="text-center mt-10 text-gray-500">Loading product...</p>
-    );
-  if (error)
-    return <p className="text-center mt-10 text-red-500">Error: {error}</p>;
+  if (loading) return <p className="text-center mt-10 text-gray-500">Loading product...</p>;
+  if (error) return <p className="text-center mt-10 text-red-500">Error: {error}</p>;
   if (!selectedProduct) return null;
 
-  const { name, description, price, image, category } = selectedProduct;
+  const { name, description, price, image, category, countInStock } = selectedProduct;
   const imagePath = image?.startsWith("/uploads")
-    ? `http://localhost:4000${image}`
+    ? `${import.meta.env.VITE_API_URL || ""}${image}`
     : image;
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <img
-          src={imagePath}
-          alt={`Image of ${name}`}
+          src={imagePath || "/placeholder.jpg"}
+          alt={`Image of ${name || "product"}`}
           className="w-full h-40 object-contain rounded shadow"
         />
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">
-            {name}
-          </h2>
-          <p className="text-gray-700 dark:text-white">{description}</p>
+          <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">{name || "Unnamed Product"}</h2>
+          <p className="text-gray-700 dark:text-white">{description || "No description available."}</p>
           <p className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">
-            Category: {category.charAt(0).toUpperCase() + category.slice(1)}
+            Category: {category ? category.charAt(0).toUpperCase() + category.slice(1) : "Uncategorized"}
           </p>
-          <p className="text-2xl font-bold text-[var(--color-teal-500)]">
-            ₹{price}
-          </p>
+          <p className="text-2xl font-bold text-[var(--color-teal-500)]">{formatCurrency(price || 0)}</p>
 
+          {/* Stock status */}
           {(() => {
-            const stock = selectedProduct.countInStock;
-
-            if (stock === 0) {
-              return (
-                <p className="text-sm text-red-500 font-semibold mt-1">
-                  Out of Stock
-                </p>
-              );
-            } else if (stock === 1) {
-              return (
-                <p className="text-sm text-red-500 font-semibold mt-1">
-                  Only 1 left — last piece!
-                </p>
-              );
-            } else if (stock === 2) {
-              return (
-                <p className="text-sm text-orange-500 font-semibold mt-1">
-                  Only 2 left — selling fast!
-                </p>
-              );
-            } else if (stock === 3) {
-              return (
-                <p className="text-sm text-yellow-600 font-semibold mt-1">
-                  Only 3 left — order soon!
-                </p>
-              );
+            if (countInStock === 0) {
+              return <p className="text-sm text-red-500 font-semibold mt-1">Out of Stock</p>;
+            } else if (countInStock === 1) {
+              return <p className="text-sm text-red-500 font-semibold mt-1">Only 1 left — last piece!</p>;
+            } else if (countInStock === 2) {
+              return <p className="text-sm text-orange-500 font-semibold mt-1">Only 2 left — selling fast!</p>;
+            } else if (countInStock === 3) {
+              return <p className="text-sm text-yellow-600 font-semibold mt-1">Only 3 left — order soon!</p>;
             } else {
-              return (
-                <p className="text-sm text-gray-500 mt-1">
-                  Available: {stock} in stock
-                </p>
-              );
+              return <p className="text-sm text-gray-500 mt-1">Available: {countInStock} in stock</p>;
             }
           })()}
 
           <button
             onClick={handleAddToCart}
-            disabled={selectedProduct.countInStock === 0}
+            disabled={countInStock === 0}
             className={`px-4 py-2 rounded text-white text-sm font-medium transition ${
-              selectedProduct.countInStock === 0
+              countInStock === 0
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-[var(--color-teal-500)] hover:bg-[var(--color-teal-600)] cursor-pointer"
             }`}
@@ -177,28 +154,21 @@ const ProductDetails = () => {
           </button>
 
           <p className="text-sm text-gray-500 dark:text-gray-300 italic mt-2">
-            To compare cycles, visit the product list and use the “Add to
-            Compare” button.
+            To compare cycles, visit the product list and use the “Add to Compare” button.
           </p>
         </div>
       </div>
 
       {/* Reviews Section */}
       <div className="mt-12 space-y-6 bg-gray-50 dark:bg-[var(--color-charcoal-700)] p-6 rounded-lg shadow">
-        <h3 className="text-xl font-bold text-[var(--color-teal-500)] mb-4">
-          Customer Reviews
-        </h3>
+        <h3 className="text-xl font-bold text-[var(--color-teal-500)] mb-4">Customer Reviews</h3>
 
         {!user ? (
-          <p className="text-sm text-gray-600 dark:text-gray-300 italic">
-            Please log in to leave a review.
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 italic">Please log in to leave a review.</p>
         ) : (
           <form onSubmit={handleSubmitReview} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Rating:
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rating:</label>
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
@@ -213,9 +183,7 @@ const ProductDetails = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Comment:
-              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comment:</label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -234,6 +202,7 @@ const ProductDetails = () => {
           </form>
         )}
 
+                {/* Review List */}
         <div className="mt-6 space-y-4">
           {localReviews.length === 0 ? (
             <p className="text-center text-gray-600 dark:text-gray-300 italic">
@@ -275,9 +244,7 @@ const ProductDetails = () => {
                     ))}
                   </div>
 
-                  <p className="text-gray-800 dark:text-white">
-                    {review.comment}
-                  </p>
+                  <p className="text-gray-800 dark:text-white">{review.comment}</p>
 
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {review.name} •{" "}

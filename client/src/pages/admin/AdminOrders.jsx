@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { fetchAllOrders } from '../../redux/slices/orderSlice';
-import { toast } from 'react-toastify';
-import { FiUser, FiTag, FiPackage } from 'react-icons/fi';
+import { useEffect } from "react";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import { fetchAllOrders } from "../../redux/slices/orderSlice";
+import { toast } from "react-toastify";
+import { FiUser, FiTag, FiPackage } from "react-icons/fi";
 
 const AdminOrders = () => {
   const dispatch = useDispatch();
@@ -13,7 +13,7 @@ const AdminOrders = () => {
       loading: state.orders.loading,
       error: state.orders.error,
     }),
-    shallowEqual
+    shallowEqual,
   );
 
   useEffect(() => {
@@ -22,19 +22,34 @@ const AdminOrders = () => {
 
   useEffect(() => {
     if (error) {
-      toast.error(error);
+      toast.error(error, { className: "toastError" });
     }
   }, [error]);
 
-  if (loading) return <p className="text-center mt-10 text-gray-500">Loading orders...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">Error loading orders.</p>;
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+
+  if (loading)
+    return <p className="text-center mt-10 text-gray-500">Loading orders...</p>;
+  if (error)
+    return (
+      <p className="text-center mt-10 text-red-500">Error loading orders.</p>
+    );
 
   return (
     <div className="max-w-6xl mx-auto mt-10 space-y-6">
-      <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">Admin Order Dashboard</h2>
+      <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">
+        Admin Order Dashboard
+      </h2>
 
       {allOrders.length === 0 ? (
-        <p className="text-center text-[var(--color-charcoal-700)]">No orders found.</p>
+        <p className="text-center text-[var(--color-charcoal-700)]">
+          No orders found.
+        </p>
       ) : (
         <div className="space-y-4">
           {allOrders.map((order) => (
@@ -50,26 +65,27 @@ const AdminOrders = () => {
                 </h3>
                 <span
                   className={`text-sm px-2 py-1 rounded uppercase ${
-                    order.status === 'paid'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
+                    order.status === "paid"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
                   }`}
                 >
-                  {order.status.toUpperCase()}
+                  {order.status?.toUpperCase() || "UNKNOWN"}
                 </span>
               </div>
 
               <p className="text-sm text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)] mt-2 flex items-center gap-2">
-                <FiUser /> User ID: {order.userId?.name || order.userId}
+                <FiUser /> User: {order.userId?.name || order.userId}
               </p>
               <p className="text-sm mt-1 flex items-center gap-2">
-                <FiTag /> Total: ₹{order.total}
+                <FiTag /> Total: {formatCurrency(order.total)}
               </p>
 
               <ul className="mt-2 list-disc list-inside text-sm">
-                {order.items.map((item, index) => (
+                {(order.items || []).map((item, index) => (
                   <li key={index}>
-                    {item.name} × {item.quantity} — ₹{item.price * item.quantity}
+                    {item.name} × {item.quantity} —{" "}
+                    {formatCurrency(item.price * item.quantity)}
                   </li>
                 ))}
               </ul>

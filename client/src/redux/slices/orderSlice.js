@@ -1,38 +1,65 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from '../../utils/axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "../../utils/axios";
 
 // Create a new order (called after payment success)
-export const createOrder = createAsyncThunk('orders/createOrder', async (orderData, thunkAPI) => {
-  try {
-    const { data } = await axios.post('/api/orders', orderData);
-    return data;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to create order');
+export const createOrder = createAsyncThunk(
+  "orders/createOrder",
+  async (orderData, thunkAPI) => {
+    try {
+      const { token } = thunkAPI.getState().auth;
+      const { data } = await axios.post("/api/orders", orderData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data.order; // return the order object
+    } catch (err) {
+      console.error("Create order error:", err?.message || err);
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to create order"
+      );
+    }
   }
-});
+);
 
 // Fetch orders for logged-in user
-export const fetchUserOrders = createAsyncThunk('orders/fetchUserOrders', async (_, thunkAPI) => {
-  try {
-    const { data } = await axios.get('/api/orders/user');
-    return data;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch user orders');
+export const fetchUserOrders = createAsyncThunk(
+  "orders/fetchUserOrders",
+  async (_, thunkAPI) => {
+    try {
+      const { token } = thunkAPI.getState().auth;
+      const { data } = await axios.get("/api/orders/user", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data.orders; // return array of orders
+    } catch (err) {
+      console.error("Fetch user orders error:", err?.message || err);
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to fetch user orders"
+      );
+    }
   }
-});
+);
 
 // Fetch all orders (admin only)
-export const fetchAllOrders = createAsyncThunk('orders/fetchAllOrders', async (_, thunkAPI) => {
-  try {
-    const { data } = await axios.get('/api/orders/admin');
-    return data;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data?.message || 'Failed to fetch all orders');
+export const fetchAllOrders = createAsyncThunk(
+  "orders/fetchAllOrders",
+  async (_, thunkAPI) => {
+    try {
+      const { token } = thunkAPI.getState().auth;
+      const { data } = await axios.get("/api/orders/admin", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data.orders; // return array of orders
+    } catch (err) {
+      console.error("Fetch all orders error:", err?.message || err);
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to fetch all orders"
+      );
+    }
   }
-});
+);
 
 const orderSlice = createSlice({
-  name: 'orders',
+  name: "orders",
   initialState: {
     userOrders: [],
     allOrders: [],
@@ -49,6 +76,7 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Create Order
       .addCase(createOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -59,31 +87,39 @@ const orderSlice = createSlice({
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to create order";
       })
+
+      // Fetch User Orders
       .addCase(fetchUserOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchUserOrders.fulfilled, (state, action) => {
-        state.userOrders = action.payload;
+        state.userOrders = Array.isArray(action.payload) ? action.payload : [];
         state.loading = false;
       })
       .addCase(fetchUserOrders.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch user orders";
       })
+
+      // Fetch All Orders (Admin)
       .addCase(fetchAllOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAllOrders.fulfilled, (state, action) => {
-        state.allOrders = action.payload;
+        state.allOrders = Array.isArray(action.payload)
+          ? action.payload
+          : Array.isArray(action.payload?.orders)
+          ? action.payload.orders
+          : [];
         state.loading = false;
       })
       .addCase(fetchAllOrders.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch all orders";
       });
   },
 });

@@ -5,7 +5,13 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" }); // Scroll reset
+    // Reset scroll position on route change
+    try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      // Fallback for older browsers
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   return null;

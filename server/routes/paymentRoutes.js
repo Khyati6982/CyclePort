@@ -4,6 +4,7 @@ import protect from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
+// Create Stripe payment intent (authenticated users only)
 router.post('/create-payment-intent', protect, createPaymentIntent)
 
 export default router
