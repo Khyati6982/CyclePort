@@ -27,7 +27,7 @@ connectDB()
 
 // Stripe webhook must be mounted BEFORE express.json()
 // Inject raw body parser for Stripe signature verification
-app.use('/api/webhook/', bodyParser.raw({ type: 'application/json' }), webhookRoutes)
+app.use('/api/webhook', bodyParser.raw({ type: 'application/json' }), webhookRoutes)
 
 // Security headers
 app.use(helmet())
