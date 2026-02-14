@@ -79,4 +79,7 @@ export const stripeWebhook = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+
+  console.log('Webhook secret in use:', process.env.STRIPE_WEBHOOK_SECRET);
+
 };
