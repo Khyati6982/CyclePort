@@ -74,7 +74,7 @@ function Navbar() {
       setSearchTerm("");
 
       if (exactMatch) {
-        navigate(`/products/${exactMatch._id}`);
+        navigate(`/products/${exactMatch._id}/${exactMatch.slug}`);
       } else if (products.length > 0) {
         navigate(`/products?name=${query}`);
       } else {

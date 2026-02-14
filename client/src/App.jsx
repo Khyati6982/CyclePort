@@ -92,7 +92,7 @@ function App() {
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password/:email" element={<ResetPassword />} />
           <Route path="products" element={<UserProductList />} />
-          <Route path="products/:id" element={<ProductDetails />} />
+          <Route path="products/:id/:slug?" element={<ProductDetails />} />
           <Route path="compare" element={<ComparePage />} />
 
           {/* Private Routes */}

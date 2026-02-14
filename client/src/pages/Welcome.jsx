@@ -9,7 +9,7 @@ export function Welcome() {
   const dispatch = useDispatch();
   const { products = [], loading, error } = useSelector((state) => state.products);
 
-  // 🚀 Fetch products on mount
+  // Fetch products on mount
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);

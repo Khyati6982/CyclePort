@@ -14,7 +14,7 @@ const UserProductList = () => {
   const { user } = useSelector((state) => state.auth);
   const { products = [], loading, error } = useSelector((state) => state.products);
 
-  // 🚀 Fetch products automatically on mount
+  // Fetch products automatically on mount
   useEffect(() => {
     dispatch(fetchProducts({}));
   }, [dispatch]);
@@ -112,7 +112,7 @@ const UserProductList = () => {
                   )}
 
                   <Link
-                    to={`/products/${product._id}`}
+                    to={`/products/${product._id}/${product.slug}`}
                     className="btnPrimary w-full mt-4 flex items-center justify-center gap-2 cursor-pointer"
                     aria-label={`View details of ${product.name}`}
                   >

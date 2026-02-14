@@ -111,7 +111,7 @@ const ProductDetails = () => {
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <img
-          src={imagePath || "/placeholder.jpg"}
+          src={imagePath}
           alt={`Image of ${name || "product"}`}
           className="w-full h-40 object-contain rounded shadow"
         />
@@ -202,7 +202,7 @@ const ProductDetails = () => {
           </form>
         )}
 
-                {/* Review List */}
+        {/* Review List */}
         <div className="mt-6 space-y-4">
           {localReviews.length === 0 ? (
             <p className="text-center text-gray-600 dark:text-gray-300 italic">
