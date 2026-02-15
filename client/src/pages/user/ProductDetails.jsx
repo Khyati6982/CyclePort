@@ -214,7 +214,12 @@ const ProductDetails = () => {
             <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
               {Object.entries(selectedProduct.specs).map(([key, value]) => (
                 <li key={key}>
-                  <strong>{key}:</strong> {value}
+                  <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>{" "}
+                  {typeof value === "boolean"
+                    ? value
+                      ? "Yes"
+                      : "No"
+                    : value || "N/A"}
                 </li>
               ))}
             </ul>
