@@ -20,10 +20,9 @@ router.get('/user', protect, getUserOrders);
 // Get all orders (admin only)
 router.get('/admin', protect, adminOnly, getAllOrders);
 
-// Delete order (admin only, restores stock)
+// Future enhancement: Admin dashboard delete/restock
+// Currently handled by schema middleware for Atlas deletions
 router.delete('/:id', protect, adminOnly, deleteOrder);
-
-// Manual restock (admin only, for Atlas deletions)
 router.put('/restock/:id', protect, adminOnly, restockOrder);
 
 export default router;

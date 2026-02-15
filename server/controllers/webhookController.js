@@ -26,7 +26,7 @@ export const stripeWebhook = async (req, res, next) => {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
-        const customOrderId = session.metadata?.orderId;
+        const customOrderId = session.metadata?.orderId?.trim();
         console.log("🔎 checkout.session.completed for OrderId:", customOrderId);
 
         if (customOrderId) {
@@ -47,8 +47,9 @@ export const stripeWebhook = async (req, res, next) => {
 
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object;
-        const customOrderId = paymentIntent.metadata?.orderId;
+        const customOrderId = paymentIntent.metadata?.orderId?.trim();
         console.log("🔎 payment_intent.succeeded for OrderId:", customOrderId);
+        console.log("📜 Metadata raw:", JSON.stringify(paymentIntent.metadata));
 
         if (customOrderId) {
           const order = await Order.findOne({ customOrderId });
@@ -68,7 +69,7 @@ export const stripeWebhook = async (req, res, next) => {
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object;
-        const customOrderId = paymentIntent.metadata?.orderId;
+        const customOrderId = paymentIntent.metadata?.orderId?.trim();
         console.log("🔎 payment_intent.payment_failed for OrderId:", customOrderId);
 
         if (customOrderId) {
