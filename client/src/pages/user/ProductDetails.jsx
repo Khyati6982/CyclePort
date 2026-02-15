@@ -11,7 +11,9 @@ const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectedProduct, loading, error } = useSelector((state) => state.products);
+  const { selectedProduct, loading, error } = useSelector(
+    (state) => state.products,
+  );
   const { user } = useSelector((state) => state.auth);
   const cart = useSelector((state) => state.cart.items);
 
@@ -71,7 +73,9 @@ const ProductDetails = () => {
       setRating(5);
       setComment("");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Not authorized. Please log in again.");
+      toast.error(
+        err.response?.data?.message || "Not authorized. Please log in again.",
+      );
     }
   };
 
@@ -91,11 +95,16 @@ const ProductDetails = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-10 text-gray-500">Loading product...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">Error: {error}</p>;
+  if (loading)
+    return (
+      <p className="text-center mt-10 text-gray-500">Loading product...</p>
+    );
+  if (error)
+    return <p className="text-center mt-10 text-red-500">Error: {error}</p>;
   if (!selectedProduct) return null;
 
-  const { name, description, price, image, category, countInStock } = selectedProduct;
+  const { name, description, price, image, category, countInStock } =
+    selectedProduct;
   const imagePath = image?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL || ""}${image}`
     : image;
@@ -116,25 +125,54 @@ const ProductDetails = () => {
           className="w-full h-40 object-contain rounded shadow"
         />
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">{name || "Unnamed Product"}</h2>
-          <p className="text-gray-700 dark:text-white">{description || "No description available."}</p>
-          <p className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">
-            Category: {category ? category.charAt(0).toUpperCase() + category.slice(1) : "Uncategorized"}
+          <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">
+            {name || "Unnamed Product"}
+          </h2>
+          <p className="text-gray-700 dark:text-white">
+            {description || "No description available."}
           </p>
-          <p className="text-2xl font-bold text-[var(--color-teal-500)]">{formatCurrency(price || 0)}</p>
+          <p className="text-lg font-semibold text-[var(--color-charcoal-700)] dark:text-white">
+            Category:{" "}
+            {category
+              ? category.charAt(0).toUpperCase() + category.slice(1)
+              : "Uncategorized"}
+          </p>
+          <p className="text-2xl font-bold text-[var(--color-teal-500)]">
+            {formatCurrency(price || 0)}
+          </p>
 
           {/* Stock status */}
           {(() => {
             if (countInStock === 0) {
-              return <p className="text-sm text-red-500 font-semibold mt-1">Out of Stock</p>;
+              return (
+                <p className="text-sm text-red-500 font-semibold mt-1">
+                  Out of Stock
+                </p>
+              );
             } else if (countInStock === 1) {
-              return <p className="text-sm text-red-500 font-semibold mt-1">Only 1 left — last piece!</p>;
+              return (
+                <p className="text-sm text-red-500 font-semibold mt-1">
+                  Only 1 left — last piece!
+                </p>
+              );
             } else if (countInStock === 2) {
-              return <p className="text-sm text-orange-500 font-semibold mt-1">Only 2 left — selling fast!</p>;
+              return (
+                <p className="text-sm text-orange-500 font-semibold mt-1">
+                  Only 2 left — selling fast!
+                </p>
+              );
             } else if (countInStock === 3) {
-              return <p className="text-sm text-yellow-600 font-semibold mt-1">Only 3 left — order soon!</p>;
+              return (
+                <p className="text-sm text-yellow-600 font-semibold mt-1">
+                  Only 3 left — order soon!
+                </p>
+              );
             } else {
-              return <p className="text-sm text-gray-500 mt-1">Available: {countInStock} in stock</p>;
+              return (
+                <p className="text-sm text-gray-500 mt-1">
+                  Available: {countInStock} in stock
+                </p>
+              );
             }
           })()}
 
@@ -154,21 +192,52 @@ const ProductDetails = () => {
           </button>
 
           <p className="text-sm text-gray-500 dark:text-gray-300 italic mt-2">
-            To compare cycles, visit the product list and use the “Add to Compare” button.
+            To compare cycles, visit the product list and use the “Add to
+            Compare” button.
           </p>
         </div>
       </div>
 
+      {/* Specifications Section */}
+      {selectedProduct.specs && (
+        <div className="mt-8 bg-gray-50 dark:bg-[var(--color-charcoal-700)] p-6 rounded-lg shadow">
+          <h3 className="text-xl font-bold text-[var(--color-teal-500)] mb-4">
+            Specifications
+          </h3>
+          {Array.isArray(selectedProduct.specs) ? (
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+              {selectedProduct.specs.map((spec, idx) => (
+                <li key={idx}>{spec}</li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300">
+              {Object.entries(selectedProduct.specs).map(([key, value]) => (
+                <li key={key}>
+                  <strong>{key}:</strong> {value}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       {/* Reviews Section */}
       <div className="mt-12 space-y-6 bg-gray-50 dark:bg-[var(--color-charcoal-700)] p-6 rounded-lg shadow">
-        <h3 className="text-xl font-bold text-[var(--color-teal-500)] mb-4">Customer Reviews</h3>
+        <h3 className="text-xl font-bold text-[var(--color-teal-500)] mb-4">
+          Customer Reviews
+        </h3>
 
         {!user ? (
-          <p className="text-sm text-gray-600 dark:text-gray-300 italic">Please log in to leave a review.</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 italic">
+            Please log in to leave a review.
+          </p>
         ) : (
           <form onSubmit={handleSubmitReview} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rating:</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Rating:
+              </label>
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
@@ -183,7 +252,9 @@ const ProductDetails = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comment:</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Comment:
+              </label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -244,7 +315,9 @@ const ProductDetails = () => {
                     ))}
                   </div>
 
-                  <p className="text-gray-800 dark:text-white">{review.comment}</p>
+                  <p className="text-gray-800 dark:text-white">
+                    {review.comment}
+                  </p>
 
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {review.name} •{" "}

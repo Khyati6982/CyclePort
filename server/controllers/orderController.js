@@ -16,6 +16,21 @@ const decrementStock = async (items) => {
   }
 };
 
+// Helper function to restore stocks after deleting the order
+const restoreStock = async (items) => {
+  for (const item of items) {
+    try {
+      const product = await Product.findById(item._id);
+      if (product) {
+        product.countInStock += item.quantity;
+        await product.save();
+      }
+    } catch (err) {
+      console.error("Stock restore error for item:", item, err.message);
+    }
+  }
+};
+
 // Create new order (manual or Stripe-based)
 export const createOrder = async (req, res, next) => {
   try {
@@ -55,6 +70,23 @@ export const createOrder = async (req, res, next) => {
     await decrementStock(order.items);
 
     res.status(201).json({ order });
+  } catch (err) {
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  }
+};
+
+// Delete order and restore stock
+export const deleteOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    await restoreStock(order.items);
+    await order.deleteOne();
+
+    res.status(200).json({ message: "Order deleted and stock restored" });
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error", error: err.message });
   }

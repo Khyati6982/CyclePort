@@ -81,8 +81,8 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
           items: cart,
           total,
           status: "pending",
-          paymentMethod: "Stripe",
-          customOrderId: orderId,
+          paymentMethod: "Stripe", 
+          customOrderId: orderId, 
           billingDetails,
           shippingInfo: {
             phone: billingDetails.phone,
