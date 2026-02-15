@@ -12,7 +12,7 @@ import { clearCart } from "../../redux/slices/cartSlice";
 import { createOrder } from "../../redux/slices/orderSlice";
 import axios from "../../utils/axios";
 
-const StripeForm = ({ total, billingDetails }) => {
+const StripeForm = ({ total, billingDetails, orderId }) => {
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
@@ -81,6 +81,8 @@ const StripeForm = ({ total, billingDetails }) => {
           items: cart,
           total,
           status: "paid",
+          paymentMethod: "COD",
+          customOrderId: orderId,
           billingDetails,
           shippingInfo: {
             phone: billingDetails.phone,

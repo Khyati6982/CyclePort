@@ -12,8 +12,9 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 const Payment = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [billingDetails, setBillingDetails] = useState(null);
+  const [orderId] = useState(`order-${Date.now()}`); // generate once
   const cart = useSelector((state) => state.cart.items);
-  const { token } = useSelector((state) => state.auth); // Extract token
+  const { token } = useSelector((state) => state.auth);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -24,11 +25,10 @@ const Payment = () => {
         '/api/payment/create-payment-intent',
         {
           amount: total,
-          orderId: `order-${Date.now()}`,
+          orderId,
           billingDetails: details,
         },
       );
-
       setClientSecret(data.clientSecret);
     } catch (err) {
       toast.error('Failed to initialize payment.');
@@ -46,7 +46,7 @@ const Payment = () => {
         <BillingForm onSubmit={handleBillingSubmit} />
       ) : (
         <Elements stripe={stripePromise} options={options}>
-          <StripeForm total={total} billingDetails={billingDetails} />
+          <StripeForm total={total} billingDetails={billingDetails} orderId={orderId} />
         </Elements>
       )}
     </div>

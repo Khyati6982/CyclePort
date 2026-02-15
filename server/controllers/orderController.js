@@ -19,7 +19,7 @@ const decrementStock = async (items) => {
 // Create new order (manual or Stripe-based)
 export const createOrder = async (req, res, next) => {
   try {
-    const { items, total, status, paymentMethod, shippingInfo, billingDetails } = req.body;
+    const { items, total, status, paymentMethod, shippingInfo, billingDetails, customOrderId } = req.body;
 
     if (!req.user || !req.user._id) {
       return res.status(401).json({ message: "Unauthorized: req.user missing" });
@@ -39,7 +39,7 @@ export const createOrder = async (req, res, next) => {
     }
 
     const order = new Order({
-      customOrderId: `order-${Date.now()}`,
+      customOrderId,
       userId: req.user._id,
       items,
       total,
