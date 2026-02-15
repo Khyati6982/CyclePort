@@ -80,8 +80,8 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
           userId: user?._id,
           items: cart,
           total,
-          status: "paid",
-          paymentMethod: "COD",
+          status: "pending",
+          paymentMethod: "Stripe",
           customOrderId: orderId,
           billingDetails,
           shippingInfo: {

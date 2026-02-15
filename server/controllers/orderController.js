@@ -44,7 +44,7 @@ export const createOrder = async (req, res, next) => {
       items,
       total,
       status: status || "pending",
-      paymentMethod: paymentMethod || "COD",
+      paymentMethod: paymentMethod || "Stripe",
       shippingInfo,
       billingDetails,
       isPaid: status === "paid",
