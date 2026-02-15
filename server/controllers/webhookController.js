@@ -16,7 +16,6 @@ export const stripeWebhook = async (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    // Signature verification failed
     return res.status(400).json({ error: `Webhook signature verification failed: ${err.message}` });
   }
 
@@ -28,9 +27,9 @@ export const stripeWebhook = async (req, res, next) => {
 
         if (customOrderId) {
           const order = await Order.findOne({ customOrderId });
-          if (order && !order.isPaid) {
+          if (order) {
             order.isPaid = true;
-            order.paidAt = Date.now();
+            order.paidAt = order.paidAt || Date.now();
             order.status = 'paid';
             order.paymentMethod = 'Stripe Checkout';
             await order.save();
@@ -45,9 +44,9 @@ export const stripeWebhook = async (req, res, next) => {
 
         if (customOrderId) {
           const order = await Order.findOne({ customOrderId });
-          if (order && !order.isPaid) {
+          if (order) {
             order.isPaid = true;
-            order.paidAt = Date.now();
+            order.paidAt = order.paidAt || Date.now();
             order.status = 'paid';
             order.paymentMethod = 'Stripe PaymentIntent';
             await order.save();
@@ -71,7 +70,6 @@ export const stripeWebhook = async (req, res, next) => {
       }
 
       default:
-        // Ignore unhandled event types
         break;
     }
 
@@ -79,7 +77,4 @@ export const stripeWebhook = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-
-  console.log('Webhook secret in use:', process.env.STRIPE_WEBHOOK_SECRET);
-
 };
