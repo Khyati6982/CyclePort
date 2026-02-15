@@ -4,6 +4,7 @@ import {
   getUserOrders,
   getAllOrders,
   deleteOrder,
+  restockOrder,
 } from '../controllers/orderController.js';
 import protect from '../middleware/authMiddleware.js';
 import adminOnly from '../middleware/adminMiddleware.js';
@@ -21,5 +22,8 @@ router.get('/admin', protect, adminOnly, getAllOrders);
 
 // Delete order (admin only, restores stock)
 router.delete('/:id', protect, adminOnly, deleteOrder);
+
+// Manual restock (admin only, for Atlas deletions)
+router.put('/restock/:id', protect, adminOnly, restockOrder);
 
 export default router;

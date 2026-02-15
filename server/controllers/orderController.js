@@ -5,7 +5,7 @@ import Product from '../models/Product.js';
 const decrementStock = async (items) => {
   for (const item of items) {
     try {
-      const product = await Product.findById(item._id);
+      const product = await Product.findById(item.productId || item._id);
       if (product) {
         product.countInStock = Math.max(0, product.countInStock - item.quantity);
         await product.save();
@@ -20,7 +20,7 @@ const decrementStock = async (items) => {
 const restoreStock = async (items) => {
   for (const item of items) {
     try {
-      const product = await Product.findById(item._id);
+      const product = await Product.findById(item.productId || item._id);
       if (product) {
         product.countInStock += item.quantity;
         await product.save();
@@ -87,6 +87,22 @@ export const deleteOrder = async (req, res, next) => {
     await order.deleteOne();
 
     res.status(200).json({ message: "Order deleted and stock restored" });
+  } catch (err) {
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  }
+};
+
+// Manual restock (for Atlas deletions)
+export const restockOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    await restoreStock(order.items);
+
+    res.status(200).json({ message: "Stock restored manually for order", orderId: order._id });
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error", error: err.message });
   }

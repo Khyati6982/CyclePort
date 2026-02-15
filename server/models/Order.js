@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
   customOrderId: {
@@ -26,13 +26,13 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'paid', 'shipped', 'cancelled'],
+    enum: ['pending', 'paid', 'shipped', 'cancelled', 'failed'],
     default: 'pending',
   },
   paymentMethod: {
     type: String,
-    enum: ['COD', 'Stripe'],
-    default: 'COD',
+    enum: ['COD', 'Stripe', 'Stripe PaymentIntent', 'Stripe Checkout'],
+    default: 'Stripe',
   },
   isPaid: {
     type: Boolean,
@@ -58,7 +58,7 @@ const orderSchema = new mongoose.Schema({
       country: { type: String },
     },
   },
-}, { timestamps: true })
+}, { timestamps: true });
 
-const Order = mongoose.model('Order', orderSchema)
-export default Order
+const Order = mongoose.model('Order', orderSchema);
+export default Order;
