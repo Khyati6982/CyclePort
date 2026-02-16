@@ -11,6 +11,8 @@ CyclePort is a modern, recruiter‑ready full‑stack e‑commerce application d
 💳 **Stripe Payment Integration** – Secure checkout with webhook‑based order updates.  
 📦 **Order Management** – Orders auto‑update after successful payment.  
 🛠️ **Admin Dashboard** – Manage inventory, restock products, and monitor user activity.  
+🚫 **User Deactivation** – Admins can disable accounts, preventing login access.  
+🎨 **Theme Switching** – Toggle between light and dark mode for user comfort.  
 🔔 **Error Handling & Alerts** – Inline validation, toast notifications, and graceful fallbacks.  
 📱 **Responsive UI** – Optimized for desktop, tablet, and mobile.  
 🚀 **Multi‑Platform Deployment** – Frontend on Vercel, backend on Render, tested across Netlify too.  
