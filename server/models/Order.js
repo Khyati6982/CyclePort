@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import Product from './Product.js';
 
 const orderSchema = new mongoose.Schema({
   customOrderId: {
@@ -60,25 +59,6 @@ const orderSchema = new mongoose.Schema({
     },
   },
 }, { timestamps: true });
-
-/**
- * Middleware: After an order is deleted, restore stock automatically
- */
-orderSchema.post('findOneAndDelete', async function (doc) {
-  if (doc && doc.items && doc.items.length > 0) {
-    for (const item of doc.items) {
-      try {
-        const product = await Product.findById(item.productId);
-        if (product) {
-          product.countInStock += item.quantity;
-          await product.save();
-        }
-      } catch (err) {
-        console.error("❌ Error restoring stock:", err.message);
-      }
-    }
-  }
-});
 
 const Order = mongoose.model('Order', orderSchema);
 export default Order;

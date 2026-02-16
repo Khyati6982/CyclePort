@@ -37,7 +37,9 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
           return false;
         }
         if (item.quantity > data.countInStock) {
-          toast.error(`Only ${data.countInStock} units of ${item.name} are available.`);
+          toast.error(
+            `Only ${data.countInStock} units of ${item.name} are available.`,
+          );
           return false;
         }
       }
@@ -55,8 +57,35 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
     setLoading(true);
 
     try {
+      // Create order in backend first
+      const { data } = await axios.post("/api/orders", {
+        items: cart,
+        total,
+        status: "pending",
+        paymentMethod: "Stripe",
+        billingDetails,
+        shippingInfo: {
+          phone: billingDetails.phone,
+          postalCode: billingDetails.address.postalCode,
+          city: billingDetails.address.city,
+          address: billingDetails.address.line1,
+        },
+      });
+
+      const { customOrderId } = data;
+
+      // Create PaymentIntent with metadata
+      const { data: piData } = await axios.post("/api/create-payment-intent", {
+        amount: total,
+        orderId: customOrderId,
+      });
+
+      const clientSecret = piData.clientSecret;
+
+      // Confirm payment
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
+        clientSecret,
         confirmParams: {
           return_url: `${window.location.origin}/payment-success`,
         },
@@ -70,31 +99,8 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
       }
 
       if (paymentIntent?.status === "succeeded") {
-        const isStockValid = await validateStockBeforeOrder();
-        if (!isStockValid) {
-          setLoading(false);
-          return;
-        }
-
-        const orderData = {
-          userId: user?._id,
-          items: cart,
-          total,
-          status: "pending",
-          paymentMethod: "Stripe", 
-          customOrderId: orderId, 
-          billingDetails,
-          shippingInfo: {
-            phone: billingDetails.phone,
-            postalCode: billingDetails.address.postalCode,
-            city: billingDetails.address.city,
-            address: billingDetails.address.line1,
-          },
-        };
-
-        await dispatch(createOrder(orderData));
         dispatch(clearCart());
-        toast.success("Payment successful. Order created!");
+        toast.success("Payment successful. Order updated!");
         navigate("/payment-success");
       }
     } catch (err) {
@@ -113,7 +119,8 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
         className="btnPrimary w-full mt-6 flex items-center justify-center gap-2 cursor-pointer"
         aria-label="Submit payment"
       >
-        <FiCreditCard /> {loading ? "Processing..." : `Pay ${formatCurrency(total)}`}
+        <FiCreditCard />{" "}
+        {loading ? "Processing..." : `Pay ${formatCurrency(total)}`}
       </button>
     </form>
   );

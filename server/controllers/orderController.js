@@ -34,7 +34,7 @@ const restoreStock = async (items) => {
 // Create new order (manual or Stripe-based)
 export const createOrder = async (req, res, next) => {
   try {
-    const { items, total, status, paymentMethod, shippingInfo, billingDetails, customOrderId } = req.body;
+    const { items, total, status, paymentMethod, shippingInfo, billingDetails } = req.body;
 
     if (!req.user || !req.user._id) {
       return res.status(401).json({ message: "Unauthorized: req.user missing" });
@@ -53,6 +53,9 @@ export const createOrder = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid order status." });
     }
 
+    // Generate customOrderId here in backend
+    const customOrderId = `order-${Date.now()}`;
+
     const order = new Order({
       customOrderId,
       userId: req.user._id,
@@ -69,7 +72,8 @@ export const createOrder = async (req, res, next) => {
     await order.save();
     await decrementStock(order.items);
 
-    res.status(201).json({ order });
+    // Return customOrderId so frontend can use it in Stripe metadata
+    res.status(201).json({ order, customOrderId });
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error", error: err.message });
   }
@@ -92,7 +96,7 @@ export const deleteOrder = async (req, res, next) => {
   }
 };
 
-// Manual restock (for Atlas deletions)
+// Manual restock (for Atlas deletions / future admin dashboard)
 export const restockOrder = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);

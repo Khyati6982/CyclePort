@@ -30,8 +30,6 @@ connectDB()
 app.use('/api/webhook', bodyParser.raw({ type: 'application/json' }), webhookRoutes)
 
 // Security headers
-app.use(helmet())
-
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
