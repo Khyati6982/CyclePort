@@ -75,7 +75,7 @@ const StripeForm = ({ total, billingDetails, orderId }) => {
       const { customOrderId } = data;
 
       // Create PaymentIntent with metadata
-      const { data: piData } = await axios.post("/api/create-payment-intent", {
+      const { data: piData } = await axios.post("/api/payment/create-payment-intent", {
         amount: total,
         orderId: customOrderId,
       });
