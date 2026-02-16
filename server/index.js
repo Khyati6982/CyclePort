@@ -5,6 +5,7 @@ import helmet from 'helmet'
 import connectDB from './config/db.js'
 import bodyParser from 'body-parser'
 import path from 'path'
+import fs from 'fs'
 
 // Route imports
 import authRoutes from './routes/auth.js'
@@ -25,6 +26,13 @@ const app = express()
 
 connectDB()
 
+//nsure uploads/products folder exists
+const productUploadsDir = path.join(process.cwd(), 'uploads/products')
+if (!fs.existsSync(productUploadsDir)) {
+  fs.mkdirSync(productUploadsDir, { recursive: true })
+  console.log('✅ Created uploads/products directory')
+}
+
 // Stripe webhook must be mounted BEFORE express.json()
 // Inject raw body parser for Stripe signature verification
 app.use('/api/webhook', bodyParser.raw({ type: 'application/json' }), webhookRoutes)
@@ -34,8 +42,7 @@ app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
-);
-
+)
 
 // Allowed origins (Netlify, Vercel, local dev)
 const allowedOrigins = [

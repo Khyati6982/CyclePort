@@ -1,82 +1,85 @@
-import { useState } from 'react'
-import axios from '../utils/axios'
-import { toast } from 'react-toastify'
-import { useDispatch } from 'react-redux'
-import { setUser } from '../redux/slices/authSlice'
-import { useNavigate, Link } from 'react-router-dom'
-import { FiUserPlus } from 'react-icons/fi'
+import { useState } from "react";
+import axios from "../utils/axios";
+import { toast } from "react-toastify";
+import { useNavigate, Link } from "react-router-dom";
+import { FiUserPlus } from "react-icons/fi";
 
 const Register = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [nameValid, setNameValid] = useState(true)
-  const [emailValid, setEmailValid] = useState(true)
-  const [passwordValid, setPasswordValid] = useState(true)
-  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [nameValid, setNameValid] = useState(true);
+  const [emailValid, setEmailValid] = useState(true);
+  const [passwordValid, setPasswordValid] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const validateName = (value) => {
-    setNameValid(value.trim().length >= 2)
-  }
+    setNameValid(value.trim().length >= 2);
+  };
 
   const validateEmail = (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/ // more flexible
-    setEmailValid(regex.test(value.trim()))
-  }
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/; // more flexible
+    setEmailValid(regex.test(value.trim()));
+  };
 
   const validatePassword = (value) => {
-    setPasswordValid(value.trim().length >= 6)
-  }
+    setPasswordValid(value.trim().length >= 6);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const trimmedName = name.trim()
-    const trimmedEmail = email.trim()
-    const trimmedPassword = password.trim()
+    e.preventDefault();
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
 
     if (!trimmedName || !trimmedEmail || !trimmedPassword) {
-      toast.error('Please fill all fields.', { className: 'toastError' })
-      return
+      toast.error("Please fill all fields.", { className: "toastError" });
+      return;
     }
 
     if (!nameValid || !emailValid || !passwordValid) {
-      toast.error('Please fix validation errors.', { className: 'toastError' })
-      return
+      toast.error("Please fix validation errors.", { className: "toastError" });
+      return;
     }
 
     try {
-      setLoading(true)
-      const { data } = await axios.post('/api/auth/register', {
+      setLoading(true);
+      const { data } = await axios.post("/api/auth/register", {
         name: trimmedName,
         email: trimmedEmail,
         password: trimmedPassword,
-      })
+      });
 
-      toast.success(data.message, { className: 'toastSuccess' })
+      // Show success toast
+      toast.success(
+        data.message || "User registered successfully. Please login.",
+        { className: "toastSuccess" },
+      );
 
-      // Store both user and token for consistency
-      dispatch(setUser({
-        user: data.user,
-        token: data.token,
-      }))
+      // Clear form
+      setName("");
+      setEmail("");
+      setPassword("");
 
-      setName('')
-      setEmail('')
-      setPassword('')
-      navigate('/')
+      // Redirect to login page
+      navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed.', { className: 'toastError' })
+      toast.error(err.response?.data?.message || "Registration failed.", {
+        className: "toastError",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <section className="py-10 px-6">
-      <div className="formContainer transition-transform hover:scale-[1.01]" aria-label="Registration Form">
+      <div
+        className="formContainer transition-transform hover:scale-[1.01]"
+        aria-label="Registration Form"
+      >
         <h2 className="formTitle flex items-center gap-2 text-[var(--color-teal-500)]">
           <FiUserPlus /> Create Your CyclePort Account
         </h2>
@@ -92,7 +95,7 @@ const Register = () => {
             aria-describedby="nameError"
             onChange={(e) => setName(e.target.value)}
             onBlur={(e) => validateName(e.target.value)}
-            className={`formInput ${name.length === 0 ? '' : nameValid ? 'border-green-500' : 'border-red-500'}`}
+            className={`formInput ${name.length === 0 ? "" : nameValid ? "border-green-500" : "border-red-500"}`}
             required
             disabled={loading}
           />
@@ -109,10 +112,10 @@ const Register = () => {
             autoComplete="email"
             aria-label="Email"
             aria-invalid={!emailValid}
-                        aria-describedby="emailError"
+            aria-describedby="emailError"
             onChange={(e) => setEmail(e.target.value)}
             onBlur={(e) => validateEmail(e.target.value)}
-            className={`formInput ${email.length === 0 ? '' : emailValid ? 'border-green-500' : 'border-red-500'}`}
+            className={`formInput ${email.length === 0 ? "" : emailValid ? "border-green-500" : "border-red-500"}`}
             required
             disabled={loading}
           />
@@ -124,7 +127,7 @@ const Register = () => {
 
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               autoComplete="new-password"
@@ -133,7 +136,7 @@ const Register = () => {
               aria-describedby="passwordError"
               onChange={(e) => setPassword(e.target.value)}
               onBlur={(e) => validatePassword(e.target.value)}
-              className={`formInput pr-10 ${password.length === 0 ? '' : passwordValid ? 'border-green-500' : 'border-red-500'}`}
+              className={`formInput pr-10 ${password.length === 0 ? "" : passwordValid ? "border-green-500" : "border-red-500"}`}
               required
               disabled={loading}
             />
@@ -142,9 +145,9 @@ const Register = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 -translate-y-6 text-xl cursor-pointer"
               aria-label="Toggle password visibility"
-              title={showPassword ? 'Hide Password' : 'Show Password'}
+              title={showPassword ? "Hide Password" : "Show Password"}
             >
-              {showPassword ? '🙈' : '🐵'}
+              {showPassword ? "🙈" : "🐵"}
             </button>
           </div>
 
@@ -160,7 +163,7 @@ const Register = () => {
             disabled={loading}
             aria-label="Submit registration form"
           >
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
@@ -169,7 +172,7 @@ const Register = () => {
         </Link>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

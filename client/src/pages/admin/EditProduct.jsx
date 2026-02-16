@@ -104,7 +104,7 @@ const EditProduct = () => {
       const { data } = await axios.post("/api/upload", formDataUpload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setFormData({ ...formData, image: data.imagePath });
+      setFormData({ ...formData, image: `${import.meta.env.VITE_API_URL}${data.imagePath}`});
       setPreview(`${import.meta.env.VITE_API_URL}${data.imagePath}`);
       toast.success("Image uploaded successfully!");
     } catch (err) {

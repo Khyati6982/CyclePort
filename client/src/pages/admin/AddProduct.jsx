@@ -76,7 +76,7 @@ const AddProduct = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      setForm((prev) => ({ ...prev, image: data.imagePath }));
+      setForm((prev) => ({ ...prev, image: `${import.meta.env.VITE_API_URL}${data.imagePath}` }));
       toast.success("Image uploaded successfully.");
     } catch (err) {
       toast.error(err.response?.data?.message || "Image upload failed.");
