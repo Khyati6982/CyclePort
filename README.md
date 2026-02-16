@@ -1,5 +1,5 @@
 # CyclePort 🚴‍♀️
-A Full‑Stack E‑Commerce Website
+*A Full‑Stack E‑Commerce Website*
 
 CyclePort is a modern, recruiter‑ready full‑stack e‑commerce application designed for seamless online shopping. Featuring a polished UI, secure payment integration, and robust backend automation, it delivers a smooth experience for both customers and admins.
 
@@ -43,14 +43,7 @@ CyclePort is a modern, recruiter‑ready full‑stack e‑commerce application d
 ## 🚀 Live Demo
 Experience CyclePort live:
 
-- **Frontend (Vercel):** [https://cycleport.vercel.app](https://cycleport.vercel.app)  
+- **Frontend (Netlify):** [https://cycleport.netlify.app](https://cycleport.netlify.app)  
+- **Alternate Frontend (Vercel):** [https://cycleport.vercel.app](https://cycleport.vercel.app)  
 - **Backend (Render):** [https://cycleport.onrender.com](https://cycleport.onrender.com)  
-- **Alternate Frontend (Netlify):** [https://cycleport.netlify.app](https://cycleport.netlify.app)  
 
----
-
-## 🎯 Recruiter Highlights
-- Deployed on **multiple platforms** (Vercel, Netlify, Render).  
-- Secure **Stripe integration** with webhook automation.  
-- Clean, responsive UI with recruiter‑ready polish.  
-- Documented backend logic and schema middleware for maintainability.  
