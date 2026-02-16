@@ -56,14 +56,22 @@ const StripeForm = ({ total, billingDetails }) => {
     setLoading(true);
 
     try {
-      // Validate stock before proceeding
+      // Submit elements before any async work
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        toast.error(submitError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Validate stock
       const isStockValid = await validateStockBeforeOrder();
       if (!isStockValid) {
         setLoading(false);
         return;
       }
 
-      // Create order in backend first
+      // Create order in backend
       const { data } = await axios.post("/api/orders", {
         items: cart,
         total,
@@ -87,7 +95,7 @@ const StripeForm = ({ total, billingDetails }) => {
           amount: total,
           orderId: customOrderId,
           billingDetails,
-        }
+        },
       );
 
       const clientSecret = piData.clientSecret;
