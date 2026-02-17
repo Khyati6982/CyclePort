@@ -92,7 +92,20 @@ input[type="range"]::-moz-range-thumb {
     @apply text-2xl font-bold text-teal-500 dark:text-teal-300 mb-6 text-center;
   }
 
-  
+  /* Unified form field utilities */
+  .formField {
+    @apply w-full px-3 py-2 border rounded 
+           bg-[var(--color-white)] text-[var(--color-charcoal-900)] 
+           dark:bg-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] 
+           focus:outline-none focus:ring-2 focus:ring-[var(--color-teal-500)] transition;
+  }
+  .formSelect {
+    @apply formField cursor-pointer;
+  }
+  .formTextarea {
+    @apply formField resize-none;
+  }
+
   .formButton {
     @apply w-full px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition;
   }
