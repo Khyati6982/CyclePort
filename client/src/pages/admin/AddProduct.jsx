@@ -124,7 +124,9 @@ const AddProduct = () => {
         placeholder="Product Name"
         value={form.name}
         onChange={handleChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
       />
 
@@ -134,7 +136,9 @@ const AddProduct = () => {
         placeholder="Brand"
         value={form.brand}
         onChange={handleChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
       />
 
@@ -142,7 +146,9 @@ const AddProduct = () => {
         name="category"
         value={form.category}
         onChange={handleChange}
-        className="formSelect"
+        className="w-full px-3 py-2 border rounded cursor-pointer bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
       >
         <option value="">Select Category</option>
@@ -159,7 +165,9 @@ const AddProduct = () => {
         placeholder="Price"
         value={form.price}
         onChange={handleChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
         min="1"
       />
@@ -169,7 +177,9 @@ const AddProduct = () => {
         placeholder="Description"
         value={form.description}
         onChange={handleChange}
-        className="formTextarea h-24"
+        className="w-full px-3 py-2 border rounded resize-none h-24 bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
       />
 
@@ -179,7 +189,9 @@ const AddProduct = () => {
         placeholder="Stock Count"
         value={form.countInStock}
         onChange={handleChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
         min="0"
       />
@@ -190,7 +202,8 @@ const AddProduct = () => {
           name="featured"
           checked={form.featured}
           onChange={handleChange}
-          className="formCheckbox"
+          className="h-4 w-4 text-teal-600 border-gray-300 rounded 
+                     focus:ring-teal-500 dark:bg-gray-900 dark:border-gray-700"
         />
         <span className="text-sm text-gray-700 dark:text-gray-300">
           Mark as Featured
@@ -206,7 +219,9 @@ const AddProduct = () => {
         placeholder="Frame"
         value={form.specs.frame}
         onChange={handleSpecsChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       <input
@@ -215,7 +230,9 @@ const AddProduct = () => {
         placeholder="Wheels"
         value={form.specs.wheels}
         onChange={handleSpecsChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       <input
@@ -224,7 +241,9 @@ const AddProduct = () => {
         placeholder="Weight"
         value={form.specs.weight}
         onChange={handleSpecsChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       <input
@@ -233,7 +252,9 @@ const AddProduct = () => {
         placeholder="Terrain"
         value={form.specs.terrain}
         onChange={handleSpecsChange}
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       <label className="block">
@@ -242,10 +263,12 @@ const AddProduct = () => {
           name="electric"
           value={form.specs.electric}
           onChange={handleSpecsChange}
-          className="formSelect mt-1"
+          className="w-full px-3 py-2 border rounded cursor-pointer mt-1 bg-white text-gray-900 
+                     dark:bg-gray-900 dark:text-gray-100 
+                     focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         >
           <option value="false">No</option>
-          <option value="true">Yes</option>
+                    <option value="true">Yes</option>
         </select>
       </label>
 
@@ -283,7 +306,7 @@ const AddProduct = () => {
       {/* Submit & Cancel */}
       <button
         type="submit"
-        className="btnPrimary w-full mt-4 cursor-pointer"
+        className="w-full px-4 py-2 rounded transition-colors bg-teal-500 text-white hover:bg-teal-600 cursor-pointer mt-4"
         disabled={loading}
       >
         {loading ? "Adding..." : "Add Product"}
@@ -292,7 +315,7 @@ const AddProduct = () => {
       <button
         type="button"
         onClick={() => navigate("/admin/products")}
-        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full mt-2 cursor-pointer"
+        className="w-full px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600 cursor-pointer mt-2"
       >
         Cancel Product
       </button>

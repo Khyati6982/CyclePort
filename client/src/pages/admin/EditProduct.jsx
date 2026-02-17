@@ -159,14 +159,18 @@ const EditProduct = () => {
         value={formData.name}
         onChange={handleChange}
         placeholder="Product Name"
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       <select
         name="category"
         value={formData.category}
         onChange={handleChange}
-        className="formSelect"
+        className="w-full px-3 py-2 border rounded cursor-pointer bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         required
       >
         <option value="">Select Category</option>
@@ -183,7 +187,9 @@ const EditProduct = () => {
         value={formData.price}
         onChange={handleChange}
         placeholder="Price"
-        className="formField"
+        className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       <textarea
@@ -191,7 +197,9 @@ const EditProduct = () => {
         value={formData.description}
         onChange={handleChange}
         placeholder="Description"
-        className="formTextarea h-24"
+        className="w-full px-3 py-2 border rounded resize-none h-24 bg-white text-gray-900 
+                   dark:bg-gray-900 dark:text-gray-100 
+                   focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
       />
 
       {/* Specs Section */}
@@ -206,7 +214,9 @@ const EditProduct = () => {
             placeholder="Frame"
             value={formData.specs.frame}
             onChange={handleSpecsChange}
-            className="formField mt-1"
+            className="w-full px-3 py-2 border rounded mt-1 bg-white text-gray-900 
+                       dark:bg-gray-900 dark:text-gray-100 
+                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
         </label>
 
@@ -218,7 +228,9 @@ const EditProduct = () => {
             placeholder="Wheels"
             value={formData.specs.wheels}
             onChange={handleSpecsChange}
-            className="formField mt-1"
+            className="w-full px-3 py-2 border rounded mt-1 bg-white text-gray-900 
+                       dark:bg-gray-900 dark:text-gray-100 
+                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
         </label>
 
@@ -230,7 +242,9 @@ const EditProduct = () => {
             placeholder="Weight"
             value={formData.specs.weight}
             onChange={handleSpecsChange}
-            className="formField mt-1"
+            className="w-full px-3 py-2 border rounded mt-1 bg-white text-gray-900 
+                       dark:bg-gray-900 dark:text-gray-100 
+                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
         </label>
 
@@ -242,17 +256,21 @@ const EditProduct = () => {
             placeholder="Terrain"
             value={formData.specs.terrain}
             onChange={handleSpecsChange}
-            className="formField mt-1"
+            className="w-full px-3 py-2 border rounded mt-1 bg-white text-gray-900 
+                       dark:bg-gray-900 dark:text-gray-100 
+                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
         </label>
 
         <label className="block">
           Electric
-          <select
+                    <select
             name="electric"
             value={formData.specs.electric}
             onChange={handleSpecsChange}
-            className="formSelect mt-1"
+            className="w-full px-3 py-2 border rounded cursor-pointer mt-1 bg-white text-gray-900 
+                       dark:bg-gray-900 dark:text-gray-100 
+                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           >
             <option value="false">No</option>
             <option value="true">Yes</option>
@@ -269,14 +287,15 @@ const EditProduct = () => {
           onChange={(e) =>
             setFormData({ ...formData, featured: e.target.checked })
           }
-          className="formCheckbox"
+          className="h-4 w-4 text-teal-600 border-gray-300 rounded 
+                     focus:ring-teal-500 dark:bg-gray-900 dark:border-gray-700"
         />
         <span className="text-sm text-gray-700 dark:text-gray-300">
           Mark as Featured
         </span>
       </label>
 
-            {/* Image Upload Section */}
+      {/* Image Upload Section */}
       {preview ? (
         <div className="flex flex-col items-start">
           <img
@@ -298,12 +317,14 @@ const EditProduct = () => {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="formField"
+            className="w-full px-3 py-2 border rounded bg-white text-gray-900 
+                       dark:bg-gray-900 dark:text-gray-100 
+                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
           <button
             type="button"
             onClick={handleImageUpload}
-            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 w-full"
+            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 w-full cursor-pointer"
           >
             Upload Image
           </button>
@@ -311,14 +332,17 @@ const EditProduct = () => {
       )}
 
       {/* Submit & Cancel */}
-      <button type="submit" className="btnPrimary w-full mt-4">
+      <button
+        type="submit"
+        className="w-full px-4 py-2 rounded transition-colors bg-teal-500 text-white hover:bg-teal-600 cursor-pointer mt-4"
+      >
         Save Changes
       </button>
 
       <button
         type="button"
         onClick={() => navigate("/admin/products")}
-        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 w-full mt-2 cursor-pointer"
+        className="w-full px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600 cursor-pointer mt-2"
       >
         Cancel Changes
       </button>
