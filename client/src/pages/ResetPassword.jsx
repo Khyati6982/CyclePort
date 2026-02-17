@@ -74,7 +74,7 @@ const ResetPassword = () => {
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 top-1/2 -translate-y-1 text-xl cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-6 text-xl cursor-pointer"
               title={showPassword ? 'Hide Password' : 'Show Password'}
               aria-label="Toggle password visibility"
             >

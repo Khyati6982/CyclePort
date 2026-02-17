@@ -72,9 +72,7 @@ const AddProduct = () => {
 
     try {
       const { data } = await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
       setForm((prev) => ({ ...prev, image: data.imagePath }));
       toast.success("Image uploaded successfully.");
@@ -101,8 +99,8 @@ const AddProduct = () => {
     try {
       const { data } = await axios.post("/api/products", payload);
 
-      dispatch(setProducts([...products, data]));
-      toast.success(`Product "${data.name}" added successfully.`);
+      dispatch(setProducts([...products, data.product]));
+      toast.success(`Product "${data.product.name}" added successfully.`);
       navigate("/admin/products");
     } catch (err) {
       toast.error(
@@ -126,7 +124,7 @@ const AddProduct = () => {
         placeholder="Product Name"
         value={form.name}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full"
+        className="formField"
         required
       />
 
@@ -136,7 +134,7 @@ const AddProduct = () => {
         placeholder="Brand"
         value={form.brand}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full"
+        className="formField"
         required
       />
 
@@ -144,7 +142,7 @@ const AddProduct = () => {
         name="category"
         value={form.category}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full cursor-pointer"
+        className="formSelect"
         required
       >
         <option value="">Select Category</option>
@@ -161,7 +159,7 @@ const AddProduct = () => {
         placeholder="Price"
         value={form.price}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full"
+        className="formField"
         required
         min="1"
       />
@@ -171,17 +169,17 @@ const AddProduct = () => {
         placeholder="Description"
         value={form.description}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full h-24 resize-none"
+        className="formTextarea h-24"
         required
       />
 
-            <input
+      <input
         type="number"
         name="countInStock"
         placeholder="Stock Count"
         value={form.countInStock}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full"
+        className="formField"
         required
         min="0"
       />
@@ -192,7 +190,7 @@ const AddProduct = () => {
           name="featured"
           checked={form.featured}
           onChange={handleChange}
-          className="accent-teal-500"
+          className="formCheckbox"
         />
         <span className="text-sm text-gray-700 dark:text-gray-300">
           Mark as Featured
@@ -208,7 +206,7 @@ const AddProduct = () => {
         placeholder="Frame"
         value={form.specs.frame}
         onChange={handleSpecsChange}
-        className="w-full border p-2 rounded"
+        className="formField"
       />
 
       <input
@@ -217,7 +215,7 @@ const AddProduct = () => {
         placeholder="Wheels"
         value={form.specs.wheels}
         onChange={handleSpecsChange}
-        className="w-full border p-2 rounded"
+        className="formField"
       />
 
       <input
@@ -226,7 +224,7 @@ const AddProduct = () => {
         placeholder="Weight"
         value={form.specs.weight}
         onChange={handleSpecsChange}
-        className="w-full border p-2 rounded"
+        className="formField"
       />
 
       <input
@@ -235,7 +233,7 @@ const AddProduct = () => {
         placeholder="Terrain"
         value={form.specs.terrain}
         onChange={handleSpecsChange}
-        className="w-full border p-2 rounded"
+        className="formField"
       />
 
       <label className="block">
@@ -244,7 +242,7 @@ const AddProduct = () => {
           name="electric"
           value={form.specs.electric}
           onChange={handleSpecsChange}
-          className="w-full border p-2 rounded mt-1"
+          className="formSelect mt-1"
         >
           <option value="false">No</option>
           <option value="true">Yes</option>

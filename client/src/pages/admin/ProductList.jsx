@@ -22,11 +22,15 @@ const ProductList = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
+
     try {
+      const productToDelete = products.find((p) => p._id === id);
+
       await axios.delete(`/api/products/${id}`);
       const updated = products.filter((p) => p._id !== id);
       dispatch(setProducts(updated));
-      toast.success("Product deleted successfully.");
+
+      toast.success(`Product "${productToDelete?.name}" deleted successfully.`);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete product.");
     }
@@ -107,7 +111,7 @@ const ProductList = () => {
                 className="w-full h-40 object-contain rounded mb-4"
               />
               <h3 className="text-lg font-bold text-[var(--color-teal-500)]">
-                {product.name || "Unnamed Product"}
+                {product.name ? product.name : "Product"}
               </h3>
               <p className="text-sm text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
                 {product.category

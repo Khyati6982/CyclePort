@@ -128,11 +128,14 @@ const EditProduct = () => {
         price: Number(formData.price),
         specs: {
           ...formData.specs,
-          electric: formData.specs.electric === true || formData.specs.electric === "true",
+          electric:
+            formData.specs.electric === true ||
+            formData.specs.electric === "true",
         },
       };
-      await axios.put(`/api/products/${id}`, payload);
-      toast.success("Product updated successfully!");
+      const { data } = await axios.put(`/api/products/${id}`, payload);
+
+      toast.success(`Product "${data.product.name}" updated successfully!`);
       navigate("/admin/products");
     } catch (err) {
       console.error("Update error:", err);
@@ -145,7 +148,9 @@ const EditProduct = () => {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-xl mx-auto mt-10 space-y-4">
-      <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">Edit Product</h2>
+      <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">
+        Edit Product
+      </h2>
 
       {/* Basic Fields */}
       <input
@@ -154,14 +159,14 @@ const EditProduct = () => {
         value={formData.name}
         onChange={handleChange}
         placeholder="Product Name"
-        className="border px-3 py-2 rounded w-full"
+        className="formField"
       />
 
       <select
         name="category"
         value={formData.category}
         onChange={handleChange}
-        className="border px-3 py-2 rounded w-full cursor-pointer"
+        className="formSelect"
         required
       >
         <option value="">Select Category</option>
@@ -178,7 +183,7 @@ const EditProduct = () => {
         value={formData.price}
         onChange={handleChange}
         placeholder="Price"
-        className="border px-3 py-2 rounded w-full"
+        className="formField"
       />
 
       <textarea
@@ -186,74 +191,74 @@ const EditProduct = () => {
         value={formData.description}
         onChange={handleChange}
         placeholder="Description"
-        className="border px-3 py-2 rounded w-full h-24 resize-none"
+        className="formTextarea h-24"
       />
 
       {/* Specs Section */}
       <h3 className="text-lg font-semibold mt-6">Specifications</h3>
 
-<div className="space-y-3">
-  <label className="block">
-    Frame
-    <input
-      type="text"
-      name="frame"
-      placeholder="Frame"
-      value={formData.specs.frame}
-      onChange={handleSpecsChange}
-      className="w-full border p-2 rounded mt-1"
-    />
-  </label>
+      <div className="space-y-3">
+        <label className="block">
+          Frame
+          <input
+            type="text"
+            name="frame"
+            placeholder="Frame"
+            value={formData.specs.frame}
+            onChange={handleSpecsChange}
+            className="formField mt-1"
+          />
+        </label>
 
-  <label className="block">
-    Wheels
-    <input
-      type="text"
-      name="wheels"
-      placeholder="Wheels"
-      value={formData.specs.wheels}
-      onChange={handleSpecsChange}
-      className="w-full border p-2 rounded mt-1"
-    />
-  </label>
+        <label className="block">
+          Wheels
+          <input
+            type="text"
+            name="wheels"
+            placeholder="Wheels"
+            value={formData.specs.wheels}
+            onChange={handleSpecsChange}
+            className="formField mt-1"
+          />
+        </label>
 
-  <label className="block">
-    Weight
-    <input
-      type="text"
-      name="weight"
-      placeholder="Weight"
-      value={formData.specs.weight}
-      onChange={handleSpecsChange}
-      className="w-full border p-2 rounded mt-1"
-    />
-  </label>
+        <label className="block">
+          Weight
+          <input
+            type="text"
+            name="weight"
+            placeholder="Weight"
+            value={formData.specs.weight}
+            onChange={handleSpecsChange}
+            className="formField mt-1"
+          />
+        </label>
 
-  <label className="block">
-    Terrain
-    <input
-      type="text"
-      name="terrain"
-      placeholder="Terrain"
-      value={formData.specs.terrain}
-      onChange={handleSpecsChange}
-      className="w-full border p-2 rounded mt-1"
-    />
-  </label>
+        <label className="block">
+          Terrain
+          <input
+            type="text"
+            name="terrain"
+            placeholder="Terrain"
+            value={formData.specs.terrain}
+            onChange={handleSpecsChange}
+            className="formField mt-1"
+          />
+        </label>
 
-  <label className="block">
-    Electric
-    <select
-      name="electric"
-      value={formData.specs.electric}
-      onChange={handleSpecsChange}
-      className="w-full border p-2 rounded mt-1"
-    >
-      <option value="false">No</option>
-      <option value="true">Yes</option>
-    </select>
-  </label>
-</div>
+        <label className="block">
+          Electric
+          <select
+            name="electric"
+            value={formData.specs.electric}
+            onChange={handleSpecsChange}
+            className="formSelect mt-1"
+          >
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </label>
+      </div>
 
       {/* Featured Checkbox */}
       <label className="flex items-center gap-2">
@@ -264,14 +269,14 @@ const EditProduct = () => {
           onChange={(e) =>
             setFormData({ ...formData, featured: e.target.checked })
           }
-          className="accent-teal-500"
+          className="formCheckbox"
         />
         <span className="text-sm text-gray-700 dark:text-gray-300">
           Mark as Featured
         </span>
       </label>
 
-      {/* Image Upload Section */}
+            {/* Image Upload Section */}
       {preview ? (
         <div className="flex flex-col items-start">
           <img
@@ -293,7 +298,7 @@ const EditProduct = () => {
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="border px-3 py-2 rounded w-full"
+            className="formField"
           />
           <button
             type="button"
@@ -305,11 +310,11 @@ const EditProduct = () => {
         </div>
       )}
 
-            <button type="submit" className="btnPrimary w-full mt-4">
+      {/* Submit & Cancel */}
+      <button type="submit" className="btnPrimary w-full mt-4">
         Save Changes
       </button>
 
-      {/* Cancel Button */}
       <button
         type="button"
         onClick={() => navigate("/admin/products")}

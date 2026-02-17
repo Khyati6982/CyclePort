@@ -40,6 +40,7 @@ const Profile = () => {
     setEmailValid(regex.test(value.trim()));
   };
 
+  // Upload avatar via /api/upload/profile
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -48,74 +49,76 @@ const Profile = () => {
     formData.append('image', file);
 
     try {
-      const res = await axios.post('/api/upload', formData);
+      const res = await axios.post('/api/upload/profile', formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       const imagePath = res.data.imagePath;
       setAvatar(imagePath);
-      toast.success('Image uploaded!');
+      toast.success('Profile image uploaded!');
     } catch (err) {
       toast.error('Image upload failed.');
     }
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Prevent empty updates
-  if (
-    name === user.name &&
-    email === user.email &&
-    !password &&
-    avatar === user.avatar
-  ) {
-    toast.info("No changes detected.");
-    setIsEditing(false);
-    return;
-  }
+    // Prevent empty updates
+    if (
+      name === user.name &&
+      email === user.email &&
+      !password
+    ) {
+      toast.info("No changes detected.");
+      setIsEditing(false);
+      return;
+    }
 
-  if (!nameValid || !emailValid) {
-    toast.error("Please fix validation errors.");
-    return;
-  }
+    if (!nameValid || !emailValid) {
+      toast.error("Please fix validation errors.");
+      return;
+    }
 
-  if (password && password !== confirmPassword) {
-    toast.error("Passwords do not match.");
-    return;
-  }
+    if (password && password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("email", email);
-  if (password) formData.append("password", password);
-  if (avatar) formData.append("avatar", avatar);
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    if (password) formData.append("password", password);
+    // Removed avatar append — handled separately via /api/upload/profile
 
-  setLoading(true);
-  try {
-    const { data } = await axios.put("/api/auth/profile", formData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`, // ✅ ensure JWT is sent
-      },
-    });
+    setLoading(true);
+    try {
+      const { data } = await axios.put("/api/auth/profile", formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-    // Normalize avatar before dispatch
-    const normalizedUser = {
-      ...data.user,
-      avatar: data.user.avatar?.startsWith("/uploads")
-        ? `${import.meta.env.VITE_API_URL}${data.user.avatar}`
-        : data.user.avatar || "/images/default-avatar.png",
-    };
+      // Normalize avatar before dispatch
+      const normalizedUser = {
+        ...data.user,
+        avatar: data.user.avatar?.startsWith("/uploads")
+          ? `${import.meta.env.VITE_API_URL}${data.user.avatar}`
+          : data.user.avatar || "/images/default-avatar.png",
+      };
 
-    dispatch(setUser(normalizedUser));
-    toast.success("Profile updated successfully!");
-    setPassword("");
-    setConfirmPassword("");
-    setIsEditing(false);
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Update failed");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      dispatch(setUser(normalizedUser));
+      toast.success("Profile updated successfully!");
+      setPassword("");
+      setConfirmPassword("");
+      setIsEditing(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Update failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCancel = () => {
     if (user) {
@@ -142,7 +145,7 @@ const Profile = () => {
 
   const avatarPath = avatar?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL}${avatar}`
-    : avatar || "/default-avatar.png";
+    : avatar || "/images/default-avatar.png";
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]"
@@ -236,6 +239,11 @@ const Profile = () => {
               className="inputField cursor-pointer"
               disabled={loading}
             />
+            {avatar && (
+              <div className="mt-2 flex justify-center">
+                <Avatar src={avatarPath} className="w-20 h-20" />
+              </div>
+            )}
           </div>
 
           {/* Buttons */}
@@ -248,7 +256,7 @@ const Profile = () => {
               <FiSave /> {loading ? 'Updating...' : 'Save Changes'}
             </button>
 
-            <button
+                        <button
               type="button"
               onClick={handleCancel}
               className="px-4 py-2 rounded bg-gray-100 text-gray-800 hover:bg-gray-200 transition flex items-center gap-2 cursor-pointer"

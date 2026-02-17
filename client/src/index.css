@@ -91,28 +91,19 @@ input[type="range"]::-moz-range-thumb {
   .formTitle {
     @apply text-2xl font-bold text-teal-500 dark:text-teal-300 mb-6 text-center;
   }
-  .formInput {
-    @apply w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-700 rounded 
-           focus:outline-none focus:ring-2 focus:ring-teal-500 
-           bg-white dark:bg-gray-800 text-[var(--color-charcoal-900)] dark:text-white;
-  }
-  .formInput::placeholder {
-    @apply text-gray-500 dark:text-gray-400;
-  }
-  .formInput:focus::placeholder {
-    @apply text-gray-700 dark:text-gray-300;
-  }
 
-  .inputField {
-    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded 
-           text-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] 
-           bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition;
+  /* Unified form field utilities */
+  .formField {
+    @apply w-full px-3 py-2 border rounded 
+           bg-[var(--color-white)] text-[var(--color-charcoal-900)] 
+           dark:bg-[var(--color-charcoal-900)] dark:text-[var(--color-charcoal-100)] 
+           focus:outline-none focus:ring-2 focus:ring-[var(--color-teal-500)] transition;
   }
-  .inputField::placeholder {
-    @apply text-gray-500 dark:text-gray-400;
+  .formSelect {
+    @apply formField cursor-pointer;
   }
-  .inputField:focus::placeholder {
-    @apply text-gray-700 dark:text-gray-300;
+  .formTextarea {
+    @apply formField resize-none;
   }
 
   .formButton {

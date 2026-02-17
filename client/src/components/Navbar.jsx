@@ -67,7 +67,7 @@ function Navbar() {
       const products = Array.isArray(data) ? data : data.products || [];
 
       const exactMatch = products.find(
-        (p) => p.name?.trim().toLowerCase() === query.toLowerCase()
+        (p) => p.name?.trim().toLowerCase() === query.toLowerCase(),
       );
 
       setIsMobileMenuOpen(false);
@@ -86,7 +86,7 @@ function Navbar() {
     }
   };
 
-  const formatCurrency = (amount) => 
+  const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
@@ -146,16 +146,28 @@ function Navbar() {
       {/* Desktop Nav Links */}
       <ul className="hidden md:flex space-x-6 items-center">
         <li>
-          <NavLink to="/" className="navLink">Home</NavLink>
+          <NavLink to="/" className="navLink">
+            Home
+          </NavLink>
         </li>
         <li>
-          <NavLink to="/products" className="navLink">Products</NavLink>
+          <NavLink to="/products" className="navLink">
+            Products
+          </NavLink>
         </li>
 
         {!user && (
           <>
-            <li><NavLink to="/login" className="navLink">Login</NavLink></li>
-            <li><NavLink to="/register" className="navLink">Register</NavLink></li>
+            <li>
+              <NavLink to="/login" className="navLink">
+                Login
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/register" className="navLink">
+                Register
+              </NavLink>
+            </li>
           </>
         )}
 
@@ -168,7 +180,9 @@ function Navbar() {
                 className="navLink relative"
                 aria-label="Toggle cart preview"
               >
-                <div className={`relative ${isCartPage ? "text-teal-400" : ""}`}>
+                <div
+                  className={`relative ${isCartPage ? "text-teal-400" : ""}`}
+                >
                   <FaShoppingCart size={28} />
                   {cart.length > 0 && (
                     <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs px-1 rounded-full">
@@ -179,27 +193,37 @@ function Navbar() {
               </button>
 
               {isCartOpen && (
-                <div className="absolute right-0 mt-2 w-72 p-4 space-y-2 z-50 rounded shadow-lg 
+                <div
+                  className="absolute right-0 mt-2 w-72 p-4 space-y-2 z-50 rounded shadow-lg 
                                 border border-gray-200 dark:border-[var(--color-charcoal-700)] 
                                 bg-[var(--color-white)] dark:bg-[var(--color-charcoal-900)] 
-                                dark:text-white">
+                                dark:text-white"
+                >
                   {cart.length === 0 ? (
                     <p className="text-sm text-gray-500">Your cart is empty.</p>
                   ) : (
                     <>
                       {cart.map((item) => (
-                        <div key={item._id} className="flex justify-between items-center text-sm">
+                        <div
+                          key={item._id}
+                          className="flex justify-between items-center text-sm"
+                        >
                           <span>{item.name}</span>
                           <span>x{item.quantity}</span>
                         </div>
                       ))}
                       <hr />
-                        <div className="flex justify-between font-semibold">
-                          <span>Total:</span>
-                          <span>
-                            {formatCurrency(cart.reduce((sum, item) => sum + item.price * item.quantity, 0))}
-                          </span>
-                        </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Total:</span>
+                        <span>
+                          {formatCurrency(
+                            cart.reduce(
+                              (sum, item) => sum + item.price * item.quantity,
+                              0,
+                            ),
+                          )}
+                        </span>
+                      </div>
                       <button
                         onClick={() => {
                           setIsCartOpen(false);
@@ -222,14 +246,11 @@ function Navbar() {
                 className="flex items-center gap-2 navLink"
                 aria-label="Toggle profile dropdown"
               >
-                <Avatar 
-                  src={
-                    user?.avatar?.startsWith('/uploads')
-                    ? `${import.meta.env.VITE_API_URL}${user.avatar}`
-                    : user?.avatar || "/images/default-avatar.png"
-                  } 
-                  className="w-8 h-10 object-cover rounded-full" 
+                <Avatar
+                  src={user?.avatar || "/images/default-avatar.png"}
+                  className="w-8 h-10 object-cover rounded-full"
                 />
+
                 {/* Hide welcome text on small screens */}
                 <span className="hidden md:inline">
                   Welcome, {user?.name?.split(" ")[0] || "User"}
@@ -238,10 +259,12 @@ function Navbar() {
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute right-0 top-full w-40 p-2 z-50 rounded shadow-lg 
+                <div
+                  className="absolute right-0 top-full w-40 p-2 z-50 rounded shadow-lg 
                                 border border-gray-200 dark:border-[var(--color-charcoal-700)] 
                                 bg-[var(--color-white)] dark:bg-[var(--color-charcoal-800)] 
-                                dark:text-white">
+                                dark:text-white"
+                >
                   <NavLink
                     to="/profile"
                     onClick={() => setIsDropdownOpen(false)}
@@ -249,8 +272,8 @@ function Navbar() {
                   >
                     View Profile
                   </NavLink>
-                  
-                                    <button
+
+                  <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 cursor-pointer"
                   >
