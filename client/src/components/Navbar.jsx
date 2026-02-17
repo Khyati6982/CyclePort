@@ -226,7 +226,7 @@ function Navbar() {
                   src={
                     user?.avatar?.startsWith('/uploads')
                     ? `${import.meta.env.VITE_API_URL}${user.avatar}`
-                    : user?.avatar || "default-avatar.png"
+                    : user?.avatar || "/images/default-avatar.png"
                   } 
                   className="w-8 h-10 object-cover rounded-full" 
                 />

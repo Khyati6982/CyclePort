@@ -30,7 +30,6 @@ export const registeredUser = async (req, res, next) => {
       email,
       password,
       role: 'user',
-      avatar: avatar || '/uploads/profile/default-avatar.png',
     })
 
     await user.save()

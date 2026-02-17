@@ -101,7 +101,7 @@ const Profile = () => {
       ...data.user,
       avatar: data.user.avatar?.startsWith("/uploads")
         ? `${import.meta.env.VITE_API_URL}${data.user.avatar}`
-        : data.user.avatar || "/default-avatar.png",
+        : data.user.avatar || "/images/default-avatar.png",
     };
 
     dispatch(setUser(normalizedUser));
@@ -138,7 +138,7 @@ const Profile = () => {
 
   const userAvatarPath = user?.avatar?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL}${user.avatar}`
-    : user?.avatar || "/default-avatar.png";
+    : user?.avatar || "/images/default-avatar.png";
 
   const avatarPath = avatar?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL}${avatar}`

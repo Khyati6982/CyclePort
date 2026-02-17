@@ -75,6 +75,17 @@ app.use(
   express.static(path.join(process.cwd(), 'uploads'))
 )
 
+// Serve images folder (for default avatar and other static assets)
+app.use(
+  '/images',
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }),
+  express.static(path.join(process.cwd(), 'images'))
+);
+
+
 // Upload route
 app.use('/api/upload', uploadRoutes)
 

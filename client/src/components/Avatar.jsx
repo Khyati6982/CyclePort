@@ -3,7 +3,7 @@ const Avatar = ({ src, alt = 'User Avatar', className = '' }) => {
 
   // If src starts with /uploads, prepend backend URL from env
   const resolvedSrc = src?.startsWith('/uploads')
-    ? `${import.meta.env.VITE_BACKEND_URL || ''}${src}`
+    ? `${import.meta.env.VITE_API_URL || ''}${src}`
     : src;
 
   const validSrc = resolvedSrc && resolvedSrc.trim() !== '' ? resolvedSrc : fallback;
