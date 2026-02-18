@@ -82,6 +82,45 @@ export const loginUser = async (req, res, next) => {
   }
 }
 
+// VERIFY EMAIL FOR PASSWORD RESET
+export const verifyEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body
+    const user = await User.findOne({ email })
+    if (!user) {
+      const error = new Error('User not found.')
+      error.statusCode = 404
+      throw error
+    }
+    res.status(200).json({ message: 'Email verified', email })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// RESET PASSWORD
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+    const user = await User.findOne({ email }).select('+password')
+    if (!user) {
+      const error = new Error('User not found.')
+      error.statusCode = 404
+      throw error
+    }
+
+    user.password = password
+    await user.save()
+
+    // regenerate token for security after password change
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+
+    res.status(200).json({ message: 'Password updated successfully', token })
+  } catch (error) {
+    next(error)
+  }
+}
+
 // GET PROFILE
 export const getProfile = async (req, res, next) => {
   try {
@@ -91,6 +130,7 @@ export const getProfile = async (req, res, next) => {
       error.statusCode = 404
       throw error
     }
+
     res.status(200).json({ user })
   } catch (error) {
     next(error)
@@ -145,6 +185,40 @@ export const editProfile = async (req, res, next) => {
         isActive: updatedUser.isActive,
       },
     })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// TOGGLE USER STATUS (Admin only)
+export const toggleUserStatus = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+    if (!user) {
+      const error = new Error('User not found.')
+      error.statusCode = 404
+      throw error
+    }
+
+    user.isActive = !user.isActive
+    await user.save()
+
+    const updatedUser = await User.findById(req.params.id).select('-password')
+
+    res.status(200).json({
+      message: `User ${updatedUser.isActive ? 'activated' : 'deactivated'}.`,
+      user: updatedUser,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// GET ALL USERS (Admin only)
+export const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find().select('-password')
+    res.status(200).json({ users })
   } catch (error) {
     next(error)
   }
