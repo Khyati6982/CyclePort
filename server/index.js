@@ -27,14 +27,14 @@ const app = express();
 connectDB();
 
 // Ensure uploads/profile folder exists
-const profileUploadsDir = path.join(process.cwd(), 'uploads/profile');
+const profileUploadsDir = path.join(__dirname, 'uploads/profile');
 if (!fs.existsSync(profileUploadsDir)) {
   fs.mkdirSync(profileUploadsDir, { recursive: true });
   console.log('✅ Created uploads/profile directory');
 }
 
 // Ensure uploads/products folder exists
-const productUploadsDir = path.join(process.cwd(), 'uploads/products');
+const productUploadsDir = path.join(__dirname, 'uploads/products');
 if (!fs.existsSync(productUploadsDir)) {
   fs.mkdirSync(productUploadsDir, { recursive: true });
   console.log('✅ Created uploads/products directory');
@@ -79,7 +79,7 @@ app.use(
     origin: allowedOrigins,
     credentials: true,
   }),
-  express.static(path.join(process.cwd(), 'uploads'))
+  express.static(path.join(__dirname, 'uploads'))
 );
 
 // Serve images folder (for default avatar and other static assets)
@@ -89,7 +89,7 @@ app.use(
     origin: allowedOrigins,
     credentials: true,
   }),
-  express.static(path.join(process.cwd(), 'images'))
+  express.static(path.join(__dirname, 'images'))
 );
 
 // Upload route

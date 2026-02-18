@@ -101,7 +101,7 @@ const EditProduct = () => {
     formDataUpload.append("image", imageFile);
 
     try {
-      const { data } = await axios.post("/api/upload/products", formDataUpload, {
+      const { data } = await axios.post("/api/uploads/products", formDataUpload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setFormData({ ...formData, image: data.imagePath });
