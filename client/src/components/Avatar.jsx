@@ -1,5 +1,5 @@
 const Avatar = ({ src, alt = 'User Avatar', className = '' }) => {
-  const fallback = '/images/default-avatar.png';
+  const fallback = '/images/default-avatar.jpg';
 
   // If src starts with /uploads, prepend backend URL from env
   const resolvedSrc = src?.startsWith('/uploads')
