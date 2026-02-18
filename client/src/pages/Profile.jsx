@@ -100,6 +100,11 @@ const Profile = () => {
         },
       });
 
+      // ✅ Store new token if backend sends it
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
       const normalizedUser = {
         ...data.user,
         avatar: data.user.avatar?.startsWith("/uploads")
@@ -257,7 +262,7 @@ const Profile = () => {
               <FiSave /> {loading ? "Updating..." : "Save Changes"}
             </button>
 
-            <button
+                        <button
               type="button"
               onClick={handleCancel}
               className="px-4 py-2 rounded bg-gray-100 text-gray-800 hover:bg-gray-200 transition flex items-center gap-2 cursor-pointer"

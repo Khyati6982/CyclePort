@@ -140,42 +140,34 @@ export const getProfile = async (req, res, next) => {
 // EDIT PROFILE
 export const editProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id);
     if (!user) {
-      const error = new Error('User not found.')
-      error.statusCode = 404
-      throw error
+      const error = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
     }
 
-    const { name, email, password, avatar } = req.body
-    let regenerateToken = false
+    const { name, email, password, avatar } = req.body;
 
-    if (name) user.name = name
-    if (email && email !== user.email) {
-      user.email = email
-      regenerateToken = true
-    }
-    if (password) {
-      user.password = password
-      regenerateToken = true
-    }
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (password) user.password = password;
 
+    // Handle avatar from Multer OR from body
     if (req.file) {
-      user.avatar = `/uploads/profile/${req.file.filename}`
+      user.avatar = `/uploads/profile/${req.file.filename}`;
     } else if (avatar) {
-      user.avatar = avatar
+      user.avatar = avatar;
     }
 
-    const updatedUser = await user.save()
+    const updatedUser = await user.save();
 
-    let token
-    if (regenerateToken) {
-      token = jwt.sign({ id: updatedUser._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
-    }
+    // Always regenerate token after profile update
+    const token = jwt.sign({ id: updatedUser._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
     res.status(200).json({
       message: 'Profile updated successfully.',
-      ...(token && { token }), // include token only if regenerated
+      token,
       user: {
         id: updatedUser._id,
         name: updatedUser.name,
@@ -184,11 +176,12 @@ export const editProfile = async (req, res, next) => {
         role: updatedUser.role,
         isActive: updatedUser.isActive,
       },
-    })
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
 
 // TOGGLE USER STATUS (Admin only)
 export const toggleUserStatus = async (req, res, next) => {

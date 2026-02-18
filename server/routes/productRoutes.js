@@ -5,6 +5,7 @@ import {
   getProductById,
   createProduct,
   updateProduct,
+  deleteProduct,
   getCategories,
   getPriceRange,
   addProductReview,
@@ -30,6 +31,7 @@ router.get('/:id/:slug', getProductById)
 // Protected routes (admin for product management)
 router.post('/', protect, adminOnly, createProduct)
 router.put('/:id', protect, adminOnly, updateProduct)
+router.delete('/:id', protect, adminOnly, deleteProduct)
 
 // Reviews (authenticated users)
 router.post('/:id/reviews', protect, addProductReview)

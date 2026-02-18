@@ -167,6 +167,23 @@ export const updateProduct = async (req, res, next) => {
   }
 }
 
+// DELETE /api/products/:id
+export const deleteProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      const error = new Error('Product not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    await product.remove();
+    res.status(200).json({ message: 'Product deleted successfully.' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // POST /api/products/:id/reviews
 export const addProductReview = async (req, res, next) => {
   try {
