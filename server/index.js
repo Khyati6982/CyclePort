@@ -1,69 +1,76 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
-import helmet from 'helmet'
-import connectDB from './config/db.js'
-import bodyParser from 'body-parser'
-import path from 'path'
-import fs from 'fs'
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import helmet from 'helmet';
+import connectDB from './config/db.js';
+import bodyParser from 'body-parser';
+import path from 'path';
+import fs from 'fs';
 
 // Route imports
-import authRoutes from './routes/auth.js'
-import userRoutes from './routes/user.js'
-import adminRoutes from './routes/admin.js'
-import uploadRoutes from './routes/uploadRoutes.js'
-import productRoutes from './routes/productRoutes.js'
-import orderRoutes from './routes/orderRoutes.js'
-import paymentRoutes from './routes/paymentRoutes.js'
-import webhookRoutes from './routes/webhookRoutes.js'
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
+import adminRoutes from './routes/admin.js';
+import uploadRoutes from './routes/uploadRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
 
 // Middleware imports
-import notFound from './middleware/notFound.js'
-import errorHandler from './middleware/errorMiddleware.js'
+import notFound from './middleware/notFound.js';
+import errorHandler from './middleware/errorMiddleware.js';
 
-dotenv.config()
-const app = express()
+dotenv.config();
+const app = express();
 
-connectDB()
+connectDB();
 
-//nsure uploads/products folder exists
-const productUploadsDir = path.join(process.cwd(), 'uploads/products')
+// Ensure uploads/profile folder exists
+const profileUploadsDir = path.join(process.cwd(), 'uploads/profile');
+if (!fs.existsSync(profileUploadsDir)) {
+  fs.mkdirSync(profileUploadsDir, { recursive: true });
+  console.log('✅ Created uploads/profile directory');
+}
+
+// Ensure uploads/products folder exists
+const productUploadsDir = path.join(process.cwd(), 'uploads/products');
 if (!fs.existsSync(productUploadsDir)) {
-  fs.mkdirSync(productUploadsDir, { recursive: true })
-  console.log('✅ Created uploads/products directory')
+  fs.mkdirSync(productUploadsDir, { recursive: true });
+  console.log('✅ Created uploads/products directory');
 }
 
 // Stripe webhook must be mounted BEFORE express.json()
 // Inject raw body parser for Stripe signature verification
-app.use('/api/webhook', bodyParser.raw({ type: 'application/json' }), webhookRoutes)
+app.use('/api/webhook', bodyParser.raw({ type: 'application/json' }), webhookRoutes);
 
 // Security headers
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
-)
+);
 
 // Allowed origins (Netlify, Vercel, local dev)
 const allowedOrigins = [
   "https://cycleport.netlify.app",
   "https://cycleport.vercel.app",
   "http://localhost:5173" // local dev
-]
+];
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
+      callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"))
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true
-}))
+}));
 
 // Middleware
-app.use(express.json())
+app.use(express.json());
 
 // Static uploads with CORS enabled
 app.use(
@@ -73,7 +80,7 @@ app.use(
     credentials: true,
   }),
   express.static(path.join(process.cwd(), 'uploads'))
-)
+);
 
 // Serve images folder (for default avatar and other static assets)
 app.use(
@@ -85,31 +92,30 @@ app.use(
   express.static(path.join(process.cwd(), 'images'))
 );
 
-
 // Upload route
-app.use('/api/upload', uploadRoutes)
+app.use('/api/upload', uploadRoutes);
 
 // Route mount
-app.use('/api/auth', authRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/products', productRoutes)
-app.use('/api/orders', orderRoutes)
-app.use('/api/payment', paymentRoutes)
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.send('CyclePort backend is running')
-})
+  res.send('CyclePort backend is running');
+});
 
 // Not found middleware
-app.use(notFound)
+app.use(notFound);
 
 // Global error handler
-app.use(errorHandler)
+app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`)
-})
+  console.log(`🚀 Server running on port ${PORT}`);
+});
