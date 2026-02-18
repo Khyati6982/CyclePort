@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from '../utils/axios';
-import { setUser } from '../redux/slices/authSlice';
-import { FiUser, FiEdit2, FiSave } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import Avatar from '../components/Avatar';
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "../utils/axios";
+import { setUser } from "../redux/slices/authSlice";
+import { FiUser, FiEdit2, FiSave } from "react-icons/fi";
+import { toast } from "react-toastify";
+import Avatar from "../components/Avatar";
 
 const Profile = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,30 +46,30 @@ const Profile = () => {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append("image", file);
 
     try {
-      const res = await axios.post('/api/upload/profile', formData, {
+      const res = await axios.post("/api/upload/profile", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       const imagePath = res.data.imagePath;
       setAvatar(imagePath);
-      toast.success('Profile image uploaded!');
+      toast.success("Profile image uploaded!");
     } catch (err) {
-      toast.error('Image upload failed.');
+      toast.error("Image upload failed.");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prevent empty updates
     if (
       name === user.name &&
       email === user.email &&
-      !password
+      !password &&
+      avatar === user.avatar
     ) {
       toast.info("No changes detected.");
       setIsEditing(false);
@@ -90,7 +90,7 @@ const Profile = () => {
     formData.append("name", name);
     formData.append("email", email);
     if (password) formData.append("password", password);
-    // Removed avatar append — handled separately via /api/upload/profile
+    if (avatar) formData.append("avatar", avatar);
 
     setLoading(true);
     try {
@@ -100,7 +100,6 @@ const Profile = () => {
         },
       });
 
-      // Normalize avatar before dispatch
       const normalizedUser = {
         ...data.user,
         avatar: data.user.avatar?.startsWith("/uploads")
@@ -126,8 +125,8 @@ const Profile = () => {
       setEmail(user.email);
       setAvatar(user.avatar);
     }
-    setPassword('');
-    setConfirmPassword('');
+    setPassword("");
+    setConfirmPassword("");
     setIsEditing(false);
   };
 
@@ -148,8 +147,10 @@ const Profile = () => {
     : avatar || "/images/default-avatar.jpg";
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]"
-         aria-label="User Profile Section">
+    <div
+      className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]"
+      aria-label="User Profile Section"
+    >
       <h2 className="text-xl font-bold mb-6 text-[var(--color-teal-500)] flex items-center gap-2">
         <FiUser /> Your Profile
       </h2>
@@ -183,7 +184,7 @@ const Profile = () => {
             </label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="inputField pr-10"
@@ -195,9 +196,9 @@ const Profile = () => {
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xl cursor-pointer"
                 aria-label="Toggle password visibility"
-                title={showPassword ? 'Hide Password' : 'Show Password'}
+                title={showPassword ? "Hide Password" : "Show Password"}
               >
-                {showPassword ? '🙈' : '🐵'}
+                {showPassword ? "🙈" : "🐵"}
               </button>
             </div>
           </div>
@@ -208,7 +209,7 @@ const Profile = () => {
             </label>
             <div className="relative">
               <input
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="inputField pr-10"
@@ -220,9 +221,9 @@ const Profile = () => {
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xl cursor-pointer"
                 aria-label="Toggle confirm password visibility"
-                title={showConfirmPassword ? 'Hide Password' : 'Show Password'}
+                title={showConfirmPassword ? "Hide Password" : "Show Password"}
               >
-                {showConfirmPassword ? '🙈' : '🐵'}
+                {showConfirmPassword ? "🙈" : "🐵"}
               </button>
             </div>
           </div>
@@ -253,10 +254,10 @@ const Profile = () => {
               disabled={loading}
               className="btnPrimary flex items-center gap-2 cursor-pointer"
             >
-              <FiSave /> {loading ? 'Updating...' : 'Save Changes'}
+              <FiSave /> {loading ? "Updating..." : "Save Changes"}
             </button>
 
-                        <button
+            <button
               type="button"
               onClick={handleCancel}
               className="px-4 py-2 rounded bg-gray-100 text-gray-800 hover:bg-gray-200 transition flex items-center gap-2 cursor-pointer"

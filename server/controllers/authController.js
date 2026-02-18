@@ -146,20 +146,27 @@ export const getProfile = async (req, res, next) => {
 // EDIT PROFILE
 export const editProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id);
     if (!user) {
-      const error = new Error('User not found.')
-      error.statusCode = 404
-      throw error
+      const error = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
     }
 
-    const { name, email, password } = req.body
-    if (name) user.name = name
-    if (email) user.email = email
-    if (password) user.password = password
-    if (req.file) user.avatar = `/uploads/profile/${req.file.filename}`
+    const { name, email, password, avatar } = req.body;
 
-    const updatedUser = await user.save()
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (password) user.password = password;
+
+    // Handle avatar from Multer OR from body
+    if (req.file) {
+      user.avatar = `/uploads/profile/${req.file.filename}`;
+    } else if (avatar) {
+      user.avatar = avatar;
+    }
+
+    const updatedUser = await user.save();
 
     res.status(200).json({
       message: 'Profile updated successfully.',
@@ -171,11 +178,11 @@ export const editProfile = async (req, res, next) => {
         role: updatedUser.role,
         isActive: updatedUser.isActive,
       },
-    })
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 // TOGGLE USER STATUS (Admin only)
 export const toggleUserStatus = async (req, res, next) => {
