@@ -247,7 +247,7 @@ function Navbar() {
                 aria-label="Toggle profile dropdown"
               >
                 <Avatar
-                  src={user?.avatar || "/images/default-avatar.png"}
+                  src={user?.avatar || "/images/default-avatar.jpg"}
                   className="w-8 h-10 object-cover rounded-full"
                 />
 

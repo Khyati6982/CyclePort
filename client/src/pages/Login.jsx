@@ -17,7 +17,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const validateEmail = (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/; // more flexible
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     setEmailValid(regex.test(value.trim()));
   };
 

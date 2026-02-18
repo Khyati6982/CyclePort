@@ -105,7 +105,7 @@ const Profile = () => {
         ...data.user,
         avatar: data.user.avatar?.startsWith("/uploads")
           ? `${import.meta.env.VITE_API_URL}${data.user.avatar}`
-          : data.user.avatar || "/images/default-avatar.png",
+          : data.user.avatar || "/images/default-avatar.jpg",
       };
 
       dispatch(setUser(normalizedUser));
@@ -141,11 +141,11 @@ const Profile = () => {
 
   const userAvatarPath = user?.avatar?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL}${user.avatar}`
-    : user?.avatar || "/images/default-avatar.png";
+    : user?.avatar || "/images/default-avatar.jpg";
 
   const avatarPath = avatar?.startsWith("/uploads")
     ? `${import.meta.env.VITE_API_URL}${avatar}`
-    : avatar || "/images/default-avatar.png";
+    : avatar || "/images/default-avatar.jpg";
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]"
