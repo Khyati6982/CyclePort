@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 // REGISTER USER
 export const registeredUser = async (req, res, next) => {
   try {
-    const { name, email, password, role, avatar } = req.body
+    const { name, email, password, role } = req.body
 
     if (!name || !email || !password) {
       const error = new Error('All fields are required.')
@@ -25,13 +25,7 @@ export const registeredUser = async (req, res, next) => {
       throw error
     }
 
-    const user = new User({
-      name,
-      email,
-      password,
-      role: 'user',
-    })
-
+    const user = new User({ name, email, password, role: 'user' })
     await user.save()
     res.status(201).json({ message: 'User registered successfully.' })
   } catch (error) {
@@ -43,7 +37,6 @@ export const registeredUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body
-
     if (!email || !password) {
       const error = new Error('All fields are required.')
       error.statusCode = 400
@@ -70,9 +63,7 @@ export const loginUser = async (req, res, next) => {
       throw error
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    })
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
 
     res.status(200).json({
       message: 'Login successful.',
@@ -91,42 +82,6 @@ export const loginUser = async (req, res, next) => {
   }
 }
 
-// VERIFY EMAIL FOR PASSWORD RESET
-export const verifyEmail = async (req, res, next) => {
-  try {
-    const { email } = req.body
-    const user = await User.findOne({ email })
-    if (!user) {
-      const error = new Error('User not found.')
-      error.statusCode = 404
-      throw error
-    }
-    res.status(200).json({ message: 'Email verified', email })
-  } catch (error) {
-    next(error)
-  }
-}
-
-// RESET PASSWORD
-export const resetPassword = async (req, res, next) => {
-  try {
-    const { email, password } = req.body
-    const user = await User.findOne({ email }).select('+password')
-    if (!user) {
-      const error = new Error('User not found.')
-      error.statusCode = 404
-      throw error
-    }
-
-    user.password = password
-    await user.save()
-
-    res.status(200).json({ message: 'Password updated successfully' })
-  } catch (error) {
-    next(error)
-  }
-}
-
 // GET PROFILE
 export const getProfile = async (req, res, next) => {
   try {
@@ -136,7 +91,6 @@ export const getProfile = async (req, res, next) => {
       error.statusCode = 404
       throw error
     }
-
     res.status(200).json({ user })
   } catch (error) {
     next(error)
@@ -146,30 +100,42 @@ export const getProfile = async (req, res, next) => {
 // EDIT PROFILE
 export const editProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id)
     if (!user) {
-      const error = new Error('User not found.');
-      error.statusCode = 404;
-      throw error;
+      const error = new Error('User not found.')
+      error.statusCode = 404
+      throw error
     }
 
-    const { name, email, password, avatar } = req.body;
+    const { name, email, password, avatar } = req.body
+    let regenerateToken = false
 
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (password) user.password = password;
+    if (name) user.name = name
+    if (email && email !== user.email) {
+      user.email = email
+      regenerateToken = true
+    }
+    if (password) {
+      user.password = password
+      regenerateToken = true
+    }
 
-    // Handle avatar from Multer OR from body
     if (req.file) {
-      user.avatar = `/uploads/profile/${req.file.filename}`;
+      user.avatar = `/uploads/profile/${req.file.filename}`
     } else if (avatar) {
-      user.avatar = avatar;
+      user.avatar = avatar
     }
 
-    const updatedUser = await user.save();
+    const updatedUser = await user.save()
+
+    let token
+    if (regenerateToken) {
+      token = jwt.sign({ id: updatedUser._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+    }
 
     res.status(200).json({
       message: 'Profile updated successfully.',
+      ...(token && { token }), // include token only if regenerated
       user: {
         id: updatedUser._id,
         name: updatedUser.name,
@@ -178,41 +144,7 @@ export const editProfile = async (req, res, next) => {
         role: updatedUser.role,
         isActive: updatedUser.isActive,
       },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// TOGGLE USER STATUS (Admin only)
-export const toggleUserStatus = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.id)
-    if (!user) {
-      const error = new Error('User not found.')
-      error.statusCode = 404
-      throw error
-    }
-
-    user.isActive = !user.isActive
-    await user.save()
-
-    const updatedUser = await User.findById(req.params.id).select('-password')
-
-    res.status(200).json({
-      message: `User ${updatedUser.isActive ? 'activated' : 'deactivated'}.`,
-      user: updatedUser,
     })
-  } catch (error) {
-    next(error)
-  }
-}
-
-// GET ALL USERS (Admin only)
-export const getAllUsers = async (req, res, next) => {
-  try {
-    const users = await User.find().select('-password')
-    res.status(200).json({ users })
   } catch (error) {
     next(error)
   }

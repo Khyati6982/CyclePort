@@ -71,7 +71,7 @@ const AddProduct = () => {
     formData.append("image", imageFile);
 
     try {
-      const { data } = await axios.post("/api/upload", formData, {
+      const { data } = await axios.post("/api/upload/product", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setForm((prev) => ({ ...prev, image: data.imagePath }));
