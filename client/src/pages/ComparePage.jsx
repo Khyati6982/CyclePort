@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const ComparePage = () => {
   const [cycles, setCycles] = useState([]);
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     const stored = sessionStorage.getItem("compareSnapshot");
     if (stored) {
@@ -67,15 +67,14 @@ const ComparePage = () => {
             className="border rounded-lg p-4 shadow bg-white dark:bg-[var(--color-charcoal-800)]"
           >
             <img
-              src={
-                cycle.image?.startsWith("/uploads")
-                ? `${import.meta.env.VITE_API_URL || ""}${cycle.image}`
-                : cycle.image
-              }
+              src={cycle.image || ""}
               alt={`Image of ${cycle.name}`}
               className="w-full h-48 object-contain rounded mb-3"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "";
+              }}
             />
-
             <h3 className="text-lg font-semibold text-[var(--color-teal-500)]">
               {cycle.name}
             </h3>

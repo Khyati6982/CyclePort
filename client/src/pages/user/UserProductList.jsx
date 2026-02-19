@@ -12,7 +12,11 @@ const UserProductList = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.items || []);
   const { user } = useSelector((state) => state.auth);
-  const { products = [], loading, error } = useSelector((state) => state.products);
+  const {
+    products = [],
+    loading,
+    error,
+  } = useSelector((state) => state.products);
 
   // Fetch products automatically on mount
   useEffect(() => {
@@ -43,7 +47,9 @@ const UserProductList = () => {
     }).format(amount);
 
   if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading products...</p>;
+    return (
+      <p className="text-center mt-10 text-gray-500">Loading products...</p>
+    );
   }
 
   if (error) {
@@ -51,7 +57,9 @@ const UserProductList = () => {
     toast.error(error, { className: "toastError" });
     return (
       <div className="text-center mt-10">
-        <p className="text-lg text-[var(--color-charcoal-700)]">Failed to load products.</p>
+        <p className="text-lg text-[var(--color-charcoal-700)]">
+          Failed to load products.
+        </p>
       </div>
     );
   }
@@ -91,16 +99,21 @@ const UserProductList = () => {
                   aria-label={`Product: ${product.name}`}
                 >
                   <img
-                    src={imagePath}
+                    src={product?.image || ""}
                     alt={`Image of ${product.name || "product"}`}
                     className="w-full h-40 object-contain rounded mb-4 bg-white"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = ""; 
+                    }}
                   />
                   <h3 className="text-lg font-bold text-[var(--color-teal-500)]">
                     {product.name || "Unnamed Product"}
                   </h3>
                   <p className="text-sm text-[var(--color-charcoal-700)] dark:text-[var(--color-charcoal-100)]">
                     {product.category
-                      ? product.category.charAt(0).toUpperCase() + product.category.slice(1)
+                      ? product.category.charAt(0).toUpperCase() +
+                        product.category.slice(1)
                       : "Uncategorized"}
                   </p>
                   <p className="text-md font-semibold mt-2">
@@ -108,7 +121,9 @@ const UserProductList = () => {
                   </p>
 
                   {product.countInStock === 0 && (
-                    <p className="text-sm text-red-500 font-semibold mt-1">Out of Stock</p>
+                    <p className="text-sm text-red-500 font-semibold mt-1">
+                      Out of Stock
+                    </p>
                   )}
 
                   <Link
@@ -123,7 +138,9 @@ const UserProductList = () => {
                     onClick={() => handleAddToCart(product)}
                     disabled={product.countInStock === 0}
                     className={`btnPrimary w-full mt-4 flex items-center justify-center gap-2 cursor-pointer ${
-                      product.countInStock === 0 ? "opacity-50 cursor-not-allowed" : ""
+                      product.countInStock === 0
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
                     }`}
                     aria-label={`Add ${product.name} to cart`}
                   >

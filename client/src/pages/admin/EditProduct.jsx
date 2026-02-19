@@ -11,7 +11,7 @@ const EditProduct = () => {
   const navigate = useNavigate();
 
   const { selectedProduct, loading, error } = useSelector(
-    (state) => state.products
+    (state) => state.products,
   );
 
   const [formData, setFormData] = useState({
@@ -57,11 +57,8 @@ const EditProduct = () => {
         },
       });
 
-      if (selectedProduct.image?.startsWith("/uploads")) {
-        setPreview(`${import.meta.env.VITE_API_URL}${selectedProduct.image}`);
-      } else {
-        setPreview(selectedProduct.image || "");
-      }
+      // Cloudinary URLs are already complete
+      setPreview(selectedProduct.image || "");
     }
   }, [selectedProduct]);
 
@@ -101,11 +98,12 @@ const EditProduct = () => {
     formDataUpload.append("image", imageFile);
 
     try {
-      const { data } = await axios.post("/api/uploads/products", formDataUpload, {
+      // Corrected route
+      const { data } = await axios.post("/api/upload/product", formDataUpload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setFormData({ ...formData, image: data.imagePath });
-      setPreview(`${import.meta.env.VITE_API_URL}${data.imagePath}`);
+      setFormData({ ...formData, image: data.imagePath }); // Cloudinary URL
+      setPreview(data.imagePath); // Cloudinary URL directly
       toast.success("Image uploaded successfully!");
     } catch (err) {
       console.error("Upload error:", err);
@@ -264,7 +262,7 @@ const EditProduct = () => {
 
         <label className="block">
           Electric
-                    <select
+          <select
             name="electric"
             value={formData.specs.electric}
             onChange={handleSpecsChange}

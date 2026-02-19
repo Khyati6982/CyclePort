@@ -85,87 +85,91 @@ export const getProductById = async (req, res, next) => {
 // POST /api/products
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, description, image, category, price, brand, countInStock, featured, specs } = req.body
+    const { name, description, category, price, brand, countInStock, featured, specs } = req.body;
 
     if (!name || !price || !category || !brand) {
-      const error = new Error('Missing required fields: name, price, category, brand.')
-      error.statusCode = 400
-      throw error
+      const error = new Error('Missing required fields: name, price, category, brand.');
+      error.statusCode = 400;
+      throw error;
     }
 
     if (typeof price !== 'number' || price <= 0) {
-      const error = new Error('Price must be a positive number.')
-      error.statusCode = 400
-      throw error
+      const error = new Error('Price must be a positive number.');
+      error.statusCode = 400;
+      throw error;
     }
 
     if (countInStock !== undefined && (typeof countInStock !== 'number' || countInStock < 0)) {
-      const error = new Error('countInStock must be a non-negative number.')
-      error.statusCode = 400
-      throw error
+      const error = new Error('countInStock must be a non-negative number.');
+      error.statusCode = 400;
+      throw error;
     }
 
-    const slug = slugify(name, { lower: true, strict: true })
-    const existing = await Product.findOne({ slug })
+    const slug = slugify(name, { lower: true, strict: true });
+    const existing = await Product.findOne({ slug });
     if (existing) {
-      const error = new Error('A product with this name already exists.')
-      error.statusCode = 409
-      throw error
+      const error = new Error('A product with this name already exists.');
+      error.statusCode = 409;
+      throw error;
     }
 
     const newProduct = new Product({
       name,
       slug,
       description,
-      image,
+      image: req.file ? req.file.path : req.body.image, // Cloudinary URL if uploaded
       category,
       price,
       brand,
       countInStock: countInStock ?? 0,
       featured: Boolean(featured),
       specs,
-    })
+    });
 
-    const savedProduct = await newProduct.save()
-    res.status(201).json({ product: savedProduct })
+    const savedProduct = await newProduct.save();
+    res.status(201).json({ product: savedProduct });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 // PUT /api/products/:id
 export const updateProduct = async (req, res, next) => {
   try {
-    const { name, description, image, category, price, brand, countInStock, featured, specs } = req.body
+    const { name, description, category, price, brand, countInStock, featured, specs } = req.body;
 
-    const product = await Product.findById(req.params.id)
+    const product = await Product.findById(req.params.id);
     if (!product) {
-      const error = new Error('Product not found.')
-      error.statusCode = 404
-      throw error
+      const error = new Error('Product not found.');
+      error.statusCode = 404;
+      throw error;
     }
 
     if (name) {
-      product.name = name
-      product.slug = slugify(name, { lower: true, strict: true })
+      product.name = name;
+      product.slug = slugify(name, { lower: true, strict: true });
     }
-    if (description) product.description = description
-    if (image) product.image = image
-    if (category) product.category = category
-    if (price !== undefined && typeof price === 'number' && price > 0) product.price = price
-    if (brand) product.brand = brand
+    if (description) product.description = description;
+    if (req.file) {
+      product.image = req.file.path; // Cloudinary URL if new file uploaded
+    } else if (req.body.image) {
+      product.image = req.body.image; // fallback if image passed manually
+    }
+    if (category) product.category = category;
+    if (price !== undefined && typeof price === 'number' && price > 0) product.price = price;
+    if (brand) product.brand = brand;
     if (countInStock !== undefined && typeof countInStock === 'number' && countInStock >= 0) {
-      product.countInStock = countInStock
+      product.countInStock = countInStock;
     }
-    if (typeof featured === 'boolean') product.featured = featured
-    if (specs) product.specs = specs
+    if (typeof featured === 'boolean') product.featured = featured;
+    if (specs) product.specs = specs;
 
-    const updatedProduct = await product.save()
-    res.status(200).json({ product: updatedProduct })
+    const updatedProduct = await product.save();
+    res.status(200).json({ product: updatedProduct });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
 
 // DELETE /api/products/:id
 export const deleteProduct = async (req, res, next) => {

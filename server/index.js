@@ -5,11 +5,6 @@ import helmet from 'helmet';
 import connectDB from './config/db.js';
 import bodyParser from 'body-parser';
 import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Route imports
 import authRoutes from './routes/auth.js';
@@ -30,22 +25,7 @@ const app = express();
 
 connectDB();
 
-// Ensure uploads/profile folder exists
-const profileUploadsDir = path.join(__dirname, 'uploads/profile');
-if (!fs.existsSync(profileUploadsDir)) {
-  fs.mkdirSync(profileUploadsDir, { recursive: true });
-  console.log('✅ Created uploads/profile directory');
-}
-
-// Ensure uploads/products folder exists
-const productUploadsDir = path.join(__dirname, 'uploads/products');
-if (!fs.existsSync(productUploadsDir)) {
-  fs.mkdirSync(productUploadsDir, { recursive: true });
-  console.log('✅ Created uploads/products directory');
-}
-
 // Stripe webhook must be mounted BEFORE express.json()
-// Inject raw body parser for Stripe signature verification
 app.use('/api/webhook', bodyParser.raw({ type: 'application/json' }), webhookRoutes);
 
 // Security headers
@@ -76,16 +56,6 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
-// Static uploads with CORS enabled
-app.use(
-  '/uploads',
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  }),
-  express.static(path.join(__dirname, 'uploads'))
-);
-
 // Serve images folder (for default avatar and other static assets)
 app.use(
   '/images',
@@ -93,7 +63,7 @@ app.use(
     origin: allowedOrigins,
     credentials: true,
   }),
-  express.static(path.join(__dirname, 'images'))
+  express.static(path.join(process.cwd(), 'images'))
 );
 
 // Upload route

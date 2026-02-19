@@ -153,11 +153,11 @@ export const editProfile = async (req, res, next) => {
     if (email) user.email = email;
     if (password) user.password = password;
 
-    // Handle avatar from Multer OR from body
+    // Handle avatar from Cloudinary OR fallback
     if (req.file) {
-      user.avatar = `/uploads/profile/${req.file.filename}`;
+      user.avatar = req.file.path; // Cloudinary URL if uploaded
     } else if (avatar) {
-      user.avatar = avatar;
+      user.avatar = avatar; // fallback if passed manually
     }
 
     const updatedUser = await user.save();
@@ -181,7 +181,6 @@ export const editProfile = async (req, res, next) => {
     next(error);
   }
 };
-
 
 // TOGGLE USER STATUS (Admin only)
 export const toggleUserStatus = async (req, res, next) => {

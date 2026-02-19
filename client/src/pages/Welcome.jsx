@@ -7,7 +7,11 @@ import { FiSearch } from "react-icons/fi";
 
 export function Welcome() {
   const dispatch = useDispatch();
-  const { products = [], loading, error } = useSelector((state) => state.products);
+  const {
+    products = [],
+    loading,
+    error,
+  } = useSelector((state) => state.products);
 
   // Fetch products on mount
   useEffect(() => {
@@ -58,22 +62,17 @@ export function Welcome() {
                 key={cycle._id}
                 className="min-w-[220px] h-full bg-white dark:bg-gray-900 p-4 rounded shadow hover:shadow-lg hover:scale-[1.01] transition-transform flex flex-col items-center text-center"
               >
-                {cycle.image ? (
+                {cycle.image && (
                   <img
-                    src={
-                      cycle.image.startsWith("/uploads")
-                        ? `${import.meta.env.VITE_API_URL}${cycle.image}`
-                        : cycle.image
-                    }
+                    src={cycle.image}
                     alt={`Image of ${cycle.name}`}
                     className="h-32 w-full object-contain rounded mb-2"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = ""; 
+                    }}
                   />
-                ) : (
-                  <div className="h-32 w-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded mb-2 text-gray-500 dark:text-gray-400 text-sm">
-                    No image found
-                  </div>
                 )}
-
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                   {cycle.name}
                 </h3>

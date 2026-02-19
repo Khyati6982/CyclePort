@@ -103,11 +103,7 @@ const ProductDetails = () => {
     return <p className="text-center mt-10 text-red-500">Error: {error}</p>;
   if (!selectedProduct) return null;
 
-  const { name, description, price, image, category, countInStock } =
-    selectedProduct;
-  const imagePath = image?.startsWith("/uploads")
-    ? `${import.meta.env.VITE_API_URL || ""}${image}`
-    : image;
+  const { name, description, price, image, category, countInStock } = selectedProduct;
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-IN", {
@@ -120,9 +116,13 @@ const ProductDetails = () => {
     <div className="max-w-4xl mx-auto mt-10 p-6 bg-white dark:bg-[var(--color-charcoal-800)] rounded shadow transition-transform hover:scale-[1.01]">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <img
-          src={imagePath}
+          src={image || ""}
           alt={`Image of ${name || "product"}`}
           className="w-full h-40 object-contain rounded shadow"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "";
+          }}
         />
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-[var(--color-teal-500)]">

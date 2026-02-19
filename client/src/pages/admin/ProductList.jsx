@@ -100,15 +100,13 @@ const ProductList = () => {
               aria-label={`Product ${product.name}`}
             >
               <img
-                src={
-                  product?.image
-                    ? product.image.startsWith("/uploads")
-                      ? `${import.meta.env.VITE_API_URL}${product.image}`
-                      : product.image
-                    : ""
-                }
+                src={product?.image || ""}
                 alt={product?.name || "Product image"}
                 className="w-full h-40 object-contain rounded mb-4"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = ""; 
+                }}
               />
               <h3 className="text-lg font-bold text-[var(--color-teal-500)]">
                 {product.name ? product.name : "Product"}

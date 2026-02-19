@@ -71,10 +71,11 @@ const AddProduct = () => {
     formData.append("image", imageFile);
 
     try {
-      const { data } = await axios.post("/api/uploads/products", formData, {
+      // Corrected route to match backend
+      const { data } = await axios.post("/api/upload/product", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setForm((prev) => ({ ...prev, image: data.imagePath }));
+      setForm((prev) => ({ ...prev, image: data.imagePath })); // Cloudinary URL
       toast.success("Image uploaded successfully.");
     } catch (err) {
       toast.error(err.response?.data?.message || "Image upload failed.");
@@ -104,7 +105,7 @@ const AddProduct = () => {
       navigate("/admin/products");
     } catch (err) {
       toast.error(
-        err.response?.data?.message || err.message || "Failed to add product."
+        err.response?.data?.message || err.message || "Failed to add product.",
       );
     } finally {
       setLoading(false);
@@ -268,7 +269,7 @@ const AddProduct = () => {
                      focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
         >
           <option value="false">No</option>
-                    <option value="true">Yes</option>
+          <option value="true">Yes</option>
         </select>
       </label>
 
