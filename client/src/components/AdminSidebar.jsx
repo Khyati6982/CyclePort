@@ -23,7 +23,7 @@ function AdminSidebar({ onLogout, onLinkClick }) {
 
   return (
     <aside
-      className="w-64 h-full flex flex-col p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
+      className="w-64 min-h-screen flex flex-col p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
       aria-label="Admin sidebar navigation"
     >
       {/* Top Section: Identity + Links */}
