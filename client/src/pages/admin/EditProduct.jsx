@@ -121,6 +121,11 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!formData.image) {
+        toast.error("Please upload an image before saving.");
+        return;
+      }
+
       const payload = {
         ...formData,
         image: formData.image,
@@ -132,7 +137,10 @@ const EditProduct = () => {
             formData.specs.electric === "true",
         },
       };
-      const { data } = await axios.put(`/api/products/${id}`, payload);
+
+      const { data } = await axios.put(`/api/products/${id}`, payload, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       toast.success(`Product "${data.product.name}" updated successfully!`);
       navigate("/admin/products");

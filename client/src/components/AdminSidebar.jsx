@@ -23,7 +23,7 @@ function AdminSidebar({ onLogout, onLinkClick }) {
 
   return (
     <aside
-      className="w-64 min-h-screen flex flex-col p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
+      className="w-64 h-full flex flex-col p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
       aria-label="Admin sidebar navigation"
     >
       {/* Top Section: Identity + Links */}
@@ -67,7 +67,7 @@ function AdminSidebar({ onLogout, onLinkClick }) {
       </div>
 
       {/* Bottom Section: Theme + Logout */}
-      <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
+      <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
         <button
           onClick={toggleTheme}
           className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:underline cursor-pointer"
