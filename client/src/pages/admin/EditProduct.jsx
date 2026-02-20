@@ -123,6 +123,7 @@ const EditProduct = () => {
     try {
       const payload = {
         ...formData,
+        image: formData.image,
         price: Number(formData.price),
         specs: {
           ...formData.specs,
