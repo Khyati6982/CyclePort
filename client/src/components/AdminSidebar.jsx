@@ -23,9 +23,10 @@ function AdminSidebar({ onLogout, onLinkClick }) {
 
   return (
     <aside
-      className="w-64 h-full flex flex-col justify-between p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
+      className="w-64 h-full flex flex-col p-4 bg-white dark:bg-[var(--color-charcoal-900)] shadow-md overflow-y-auto transition-colors"
       aria-label="Admin sidebar navigation"
     >
+      {/* Top Section: Identity + Links */}
       <div>
         {/* Admin Identity Block */}
         <div className="flex items-center gap-3 mb-6">
@@ -56,7 +57,7 @@ function AdminSidebar({ onLogout, onLinkClick }) {
                 to={link.to}
                 className={({ isActive }) => (isActive ? 'adminLink active' : 'adminLink')}
                 aria-label={`Navigate to ${link.label}`}
-                onClick={onLinkClick} 
+                onClick={onLinkClick}
               >
                 {link.label}
               </NavLink>
@@ -65,7 +66,8 @@ function AdminSidebar({ onLogout, onLinkClick }) {
         </ul>
       </div>
 
-      <div className="space-y-4 mt-10">
+      {/* Bottom Section: Theme + Logout */}
+      <div className="mt-auto pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
         <button
           onClick={toggleTheme}
           className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:underline cursor-pointer"

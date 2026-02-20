@@ -102,7 +102,7 @@ const EditProduct = () => {
       const { data } = await axios.post("/api/upload/product", formDataUpload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setFormData({ ...formData, image: data.imagePath }); // Cloudinary URL
+      setFormData((prev) => ({ ...prev, image: data.imagePath })); // Cloudinary URL
       setPreview(data.imagePath); // Cloudinary URL directly
       toast.success("Image uploaded successfully!");
     } catch (err) {
