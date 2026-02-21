@@ -176,15 +176,14 @@ export const deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
-      const error = new Error('Product not found.');
-      error.statusCode = 404;
-      throw error;
+      return res.status(404).json({ message: "Product not found." });
     }
 
-    await product.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'Product deleted successfully.' });
+    await Product.findByIdAndDelete(req.params.id); 
+    res.status(200).json({ message: "Product deleted successfully." });
   } catch (err) {
-    next(err);
+    console.error("Delete product error:", err);
+    res.status(500).json({ message: "Failed to delete product." });
   }
 };
 

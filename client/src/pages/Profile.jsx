@@ -49,13 +49,21 @@ const Profile = () => {
     formData.append("image", file);
 
     try {
-      const res = await axios.post("/api/upload/profile", formData, {
+      const res = await axios.put("/api/auth/profile", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
         },
       });
-      const imagePath = res.data.imagePath;
+
+      const imagePath = res.data.user.avatar; // Cloudinary URL from backend
       setAvatar(imagePath);
+
+      // Store new token if backend sends it
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
       toast.success("Profile image uploaded!");
     } catch (err) {
       toast.error("Image upload failed.");
@@ -100,7 +108,7 @@ const Profile = () => {
         },
       });
 
-      // ✅ Store new token if backend sends it
+      // Store new token if backend sends it
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
@@ -262,7 +270,7 @@ const Profile = () => {
               <FiSave /> {loading ? "Updating..." : "Save Changes"}
             </button>
 
-                        <button
+            <button
               type="button"
               onClick={handleCancel}
               className="px-4 py-2 rounded bg-gray-100 text-gray-800 hover:bg-gray-200 transition flex items-center gap-2 cursor-pointer"

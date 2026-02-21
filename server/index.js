@@ -10,7 +10,6 @@ import path from 'path';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import adminRoutes from './routes/admin.js';
-import uploadRoutes from './routes/uploadRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
@@ -65,9 +64,6 @@ app.use(
   }),
   express.static(path.join(process.cwd(), 'images'))
 );
-
-// Upload route
-app.use('/api/upload', uploadRoutes);
 
 // Route mount
 app.use('/api/auth', authRoutes);

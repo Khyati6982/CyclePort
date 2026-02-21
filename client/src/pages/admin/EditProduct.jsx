@@ -98,12 +98,15 @@ const EditProduct = () => {
     formDataUpload.append("image", imageFile);
 
     try {
-      // Corrected route
-      const { data } = await axios.post("/api/upload/product", formDataUpload, {
+      const { data } = await axios.put(`/api/products/${id}`, formDataUpload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setFormData((prev) => ({ ...prev, image: data.imagePath })); // Cloudinary URL
-      setPreview(data.imagePath); // Cloudinary URL directly
+
+      // Cloudinary URL returned from backend
+      setFormData((prev) => ({ ...prev, image: data.product.image }));
+      setPreview(data.product.image);
+      setImageFile(null);
+
       toast.success("Image uploaded successfully!");
     } catch (err) {
       console.error("Upload error:", err);
@@ -121,8 +124,8 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!formData.image) {
-        toast.error("Please upload an image before saving.");
+      if (!formData.image || formData.image.startsWith("/uploads/")) {
+        toast.error("Please upload a valid Cloudinary image before saving.");
         return;
       }
 
