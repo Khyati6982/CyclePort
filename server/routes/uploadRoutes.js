@@ -49,4 +49,5 @@ router.post('/profile', protect, uploadProfile.single('image'), (req, res) => {
   res.status(200).json({ imagePath: req.file.path }); // Cloudinary CDN URL
 });
 
+export { uploadProduct, uploadProfile };
 export default router;

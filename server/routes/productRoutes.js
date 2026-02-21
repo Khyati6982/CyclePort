@@ -18,7 +18,7 @@ import protect from '../middleware/authMiddleware.js';
 import adminOnly from '../middleware/adminMiddleware.js';
 
 // Import Cloudinary storage middleware
-import { uploadProduct } from './uploadRoutes.js'; // adjust path if needed
+import { uploadProduct } from './uploadRoutes.js'; 
 
 const router = express.Router();
 
