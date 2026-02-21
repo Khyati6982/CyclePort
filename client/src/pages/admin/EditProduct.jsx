@@ -88,33 +88,6 @@ const EditProduct = () => {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleImageUpload = async () => {
-    if (!imageFile) {
-      toast.error("Please choose an image first.");
-      return;
-    }
-
-    const formDataUpload = new FormData();
-    formDataUpload.append("image", imageFile);
-
-    try {
-      const { data } = await axios.put(`/api/products/${id}`, formDataUpload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setFormData((prev) => ({ ...prev, image: data.product.image }));
-      setPreview(data.product.image);
-      setImageFile(null);
-
-      toast.success("Image uploaded successfully!");
-    } catch (err) {
-      console.error("Upload error:", err);
-      toast.error("Failed to upload image.");
-    }
-  };
-
   const handleRemoveImage = () => {
     setFormData({ ...formData, image: "" });
     setPreview("");
@@ -327,19 +300,19 @@ const EditProduct = () => {
         <div className="space-y-2">
           <input
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/webp"
             onChange={handleImageChange}
             className="w-full px-3 py-2 border rounded bg-white text-gray-900 
-                       dark:bg-gray-900 dark:text-gray-100 
-                       focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+               dark:bg-gray-900 dark:text-gray-100 
+               focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
           />
-          <button
-            type="button"
-            onClick={handleImageUpload}
-            className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 w-full cursor-pointer"
-          >
-            Upload Image
-          </button>
+          {preview && (
+            <img
+              src={preview}
+              alt="Product Preview"
+              className="w-40 h-40 object-contain mt-2 border rounded"
+            />
+          )}
         </div>
       )}
 

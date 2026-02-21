@@ -44,45 +44,12 @@ const Profile = () => {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const res = await axios.put("/api/auth/profile", formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      const imagePath = res.data.user.avatar; // Cloudinary URL
-      setAvatar(imagePath);
-
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-
-      toast.success("Profile image uploaded!");
-    } catch (err) {
-      console.error("Upload error:", err);
-      toast.error("Image upload failed.");
-    }
+    setAvatar(file);
+    setPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (
-      name === user.name &&
-      email === user.email &&
-      !password &&
-      avatar === user.avatar
-    ) {
-      toast.info("No changes detected.");
-      setIsEditing(false);
-      return;
-    }
 
     if (!nameValid || !emailValid) {
       toast.error("Please fix validation errors.");
@@ -98,26 +65,26 @@ const Profile = () => {
     formData.append("name", name);
     formData.append("email", email);
     if (password) formData.append("password", password);
-    if (avatar) formData.append("avatar", avatar);
+    if (avatar instanceof File) {
+      formData.append("avatar", avatar); // send file to Cloudinary
+    }
 
     setLoading(true);
     try {
       const { data } = await axios.put("/api/auth/profile", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      // Store new token if backend sends it
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
       const normalizedUser = {
         ...data.user,
-        avatar: data.user.avatar?.startsWith("/uploads")
-          ? `${import.meta.env.VITE_API_URL}${data.user.avatar}`
-          : data.user.avatar || "/images/default-avatar.jpg",
+        avatar: data.user.avatar || "/images/default-avatar.jpg",
       };
 
       dispatch(setUser(normalizedUser));
@@ -248,12 +215,12 @@ const Profile = () => {
             </label>
             <input
               type="file"
-              accept="image/*"
+              accept="image/png,image/jpeg,image/webp"
               onChange={handleImageChange}
               className="inputField cursor-pointer"
               disabled={loading}
             />
-            {avatar && (
+            {avatar && !(avatar instanceof File) && (
               <div className="mt-2 flex justify-center">
                 <Avatar src={avatarPath} className="w-20 h-20" />
               </div>

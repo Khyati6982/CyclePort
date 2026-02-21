@@ -64,41 +64,33 @@ const AddProduct = () => {
     };
   }, [preview]);
 
-  const handleImageUpload = async () => {
-    if (!imageFile) return;
-
-    const formData = new FormData();
-    formData.append("image", imageFile);
-
-    try {
-      // Corrected route to match backend
-      const { data } = await axios.post("/api/upload/product", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setForm((prev) => ({ ...prev, image: data.imagePath })); // Cloudinary URL
-      toast.success("Image uploaded successfully.");
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Image upload failed.");
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.image) {
-      toast.error("Please upload an image before submitting.");
+    if (!imageFile) {
+      toast.error("Please choose an image before submitting.");
       return;
     }
 
-    const payload = {
-      ...form,
-      price: Number(form.price),
-      countInStock: Number(form.countInStock),
-    };
+    const formDataUpload = new FormData();
+    formDataUpload.append("name", form.name);
+    formDataUpload.append("brand", form.brand);
+    formDataUpload.append("category", form.category);
+    formDataUpload.append("price", form.price);
+    formDataUpload.append("description", form.description);
+    formDataUpload.append("countInStock", form.countInStock);
+    formDataUpload.append("featured", form.featured);
+    formDataUpload.append("specs", JSON.stringify(form.specs));
+    formDataUpload.append("image", imageFile); // Cloudinary upload
 
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/products", payload);
+      const { data } = await axios.post("/api/products", formDataUpload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       dispatch(setProducts([...products, data.product]));
       toast.success(`Product "${data.product.name}" added successfully.`);
@@ -284,7 +276,7 @@ const AddProduct = () => {
         <input
           id="imageUpload"
           type="file"
-          accept="image/*"
+          accept="image/png,image/jpeg,image/webp"
           onChange={handleImageChange}
           className="hidden"
         />
@@ -295,13 +287,6 @@ const AddProduct = () => {
             className="w-32 h-32 object-cover rounded border"
           />
         )}
-        <button
-          type="button"
-          onClick={handleImageUpload}
-          className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 w-full cursor-pointer"
-        >
-          Upload Image
-        </button>
       </div>
 
       {/* Submit & Cancel */}
