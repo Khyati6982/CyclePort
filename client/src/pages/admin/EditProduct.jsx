@@ -99,10 +99,11 @@ const EditProduct = () => {
 
     try {
       const { data } = await axios.put(`/api/products/${id}`, formDataUpload, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-      // Cloudinary URL returned from backend
       setFormData((prev) => ({ ...prev, image: data.product.image }));
       setPreview(data.product.image);
       setImageFile(null);
@@ -123,26 +124,27 @@ const EditProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formDataSubmit = new FormData();
+    formDataSubmit.append("name", formData.name);
+    formDataSubmit.append("category", formData.category);
+    formDataSubmit.append("price", formData.price);
+    formDataSubmit.append("description", formData.description);
+    formDataSubmit.append("featured", formData.featured);
+    formDataSubmit.append("specs", JSON.stringify(formData.specs));
+
+    if (imageFile) {
+      formDataSubmit.append("image", imageFile);
+    } else if (formData.image) {
+      formDataSubmit.append("image", formData.image);
+    }
+
     try {
-      if (!formData.image || formData.image.startsWith("/uploads/")) {
-        toast.error("Please upload a valid Cloudinary image before saving.");
-        return;
-      }
-
-      const payload = {
-        ...formData,
-        image: formData.image,
-        price: Number(formData.price),
-        specs: {
-          ...formData.specs,
-          electric:
-            formData.specs.electric === true ||
-            formData.specs.electric === "true",
+      const { data } = await axios.put(`/api/products/${id}`, formDataSubmit, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
         },
-      };
-
-      const { data } = await axios.put(`/api/products/${id}`, payload, {
-        headers: { "Content-Type": "application/json" },
       });
 
       toast.success(`Product "${data.product.name}" updated successfully!`);

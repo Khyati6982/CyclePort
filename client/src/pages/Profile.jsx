@@ -40,7 +40,7 @@ const Profile = () => {
     setEmailValid(regex.test(value.trim()));
   };
 
-  // Upload avatar via /api/upload/profile
+  // Upload avatar
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -56,16 +56,16 @@ const Profile = () => {
         },
       });
 
-      const imagePath = res.data.user.avatar; // Cloudinary URL from backend
+      const imagePath = res.data.user.avatar; // Cloudinary URL
       setAvatar(imagePath);
 
-      // Store new token if backend sends it
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
       }
 
       toast.success("Profile image uploaded!");
     } catch (err) {
+      console.error("Upload error:", err);
       toast.error("Image upload failed.");
     }
   };
