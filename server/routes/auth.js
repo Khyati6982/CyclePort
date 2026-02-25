@@ -24,7 +24,7 @@ const profileStorage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'cycleport/profile',
-    allowed_formats: ['jpg', 'jpeg', 'png'],
+    allowed_formats: ['jpg', 'jpeg', 'png', 'avif'],
   },
 });
 
