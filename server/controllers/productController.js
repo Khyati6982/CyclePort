@@ -84,7 +84,10 @@ export const getProductById = async (req, res, next) => {
 // POST /api/products
 export const createProduct = async (req, res, next) => {
   try {
-    const { name, description, category, price, brand, countInStock, featured, specs } = req.body;
+    const price = Number(req.body.price);
+    const countInStock = Number(req.body.countInStock);
+
+    const { name, description, category, brand, featured, specs } = req.body;
 
     if (!name || !price || !category || !brand) {
       const error = new Error('Missing required fields: name, price, category, brand.');
@@ -92,13 +95,13 @@ export const createProduct = async (req, res, next) => {
       throw error;
     }
 
-    if (typeof price !== 'number' || price <= 0) {
+    if (isNaN(price) || price <= 0) {
       const error = new Error('Price must be a positive number.');
       error.statusCode = 400;
       throw error;
     }
 
-    if (countInStock !== undefined && (typeof countInStock !== 'number' || countInStock < 0)) {
+    if (!isNaN(countInStock) && countInStock < 0) {
       const error = new Error('countInStock must be a non-negative number.');
       error.statusCode = 400;
       throw error;
@@ -113,11 +116,11 @@ export const createProduct = async (req, res, next) => {
     }
 
     let imageUrl = req.body.image;
-    if(req.file) {
-      const resule = await cloudinary.ulploader.upload(req.file.path, {
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "products",
       });
-      imageUrl = resule.secure_url;
+      imageUrl = result.secure_url; 
     }
 
     const newProduct = new Product({
@@ -128,7 +131,7 @@ export const createProduct = async (req, res, next) => {
       category,
       price,
       brand,
-      countInStock: countInStock ?? 0,
+      countInStock: isNaN(countInStock) ? 0 : countInStock,
       featured: Boolean(featured),
       specs,
     });
