@@ -164,14 +164,14 @@ export const editProfile = async (req, res, next) => {
     if (email) user.email = email;
     if (password) user.password = password;
 
-    //  Handle avatar upload to Cloudinary
+    // Handle avatar upload to Cloudinary
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "profile",
+        folder: "cycleport/profile", 
       });
       user.avatar = result.secure_url; 
     } else if (avatar) {
-      user.avatar = avatar; 
+      user.avatar = avatar;
     }
 
     const updatedUser = await user.save();
@@ -183,7 +183,7 @@ export const editProfile = async (req, res, next) => {
       { expiresIn: '1d' }
     );
 
-    //Normalize avatar in response
+    // Normalize avatar in response
     const normalizedUser = {
       id: updatedUser._id,
       name: updatedUser.name,
@@ -199,9 +199,11 @@ export const editProfile = async (req, res, next) => {
       user: normalizedUser,
     });
   } catch (error) {
+    console.error("Profile update error:", error);
     next(error);
   }
 };
+
 
 // TOGGLE USER STATUS (Admin only)
 export const toggleUserStatus = async (req, res, next) => {
@@ -235,4 +237,4 @@ export const getAllUsers = async (req, res, next) => {
   } catch (error) {
     next(error)
   }
-}
+} 
