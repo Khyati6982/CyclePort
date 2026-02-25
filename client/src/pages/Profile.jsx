@@ -16,6 +16,7 @@ const Profile = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,6 +29,7 @@ const Profile = () => {
       setName(user.name);
       setEmail(user.email);
       setAvatar(user.avatar);
+      setPreview("");
     }
   }, [user]);
 
@@ -41,11 +43,11 @@ const Profile = () => {
   };
 
   // Upload avatar
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setAvatar(file);
-    setPreview(URL.createObjectURL(file));
+    setAvatar(file); // store File
+    setPreview(URL.createObjectURL(file)); 
   };
 
   const handleSubmit = async (e) => {
@@ -65,8 +67,12 @@ const Profile = () => {
     formData.append("name", name);
     formData.append("email", email);
     if (password) formData.append("password", password);
+
+    // Handle avatar correctly
     if (avatar instanceof File) {
-      formData.append("avatar", avatar); // send file to Cloudinary
+      formData.append("avatar", avatar); 
+    } else if (typeof avatar === "string") {
+      formData.append("avatar", avatar); 
     }
 
     setLoading(true);
@@ -92,6 +98,7 @@ const Profile = () => {
       setPassword("");
       setConfirmPassword("");
       setIsEditing(false);
+      setPreview(""); // reset preview after save
     } catch (error) {
       toast.error(error.response?.data?.message || "Update failed");
     } finally {
@@ -104,6 +111,7 @@ const Profile = () => {
       setName(user.name);
       setEmail(user.email);
       setAvatar(user.avatar);
+      setPreview("");
     }
     setPassword("");
     setConfirmPassword("");
@@ -118,13 +126,13 @@ const Profile = () => {
     );
   }
 
-  const userAvatarPath = user?.avatar?.startsWith("/uploads")
-    ? `${import.meta.env.VITE_API_URL}${user.avatar}`
-    : user?.avatar || "/images/default-avatar.jpg";
-
-  const avatarPath = avatar?.startsWith("/uploads")
-    ? `${import.meta.env.VITE_API_URL}${avatar}`
-    : avatar || "/images/default-avatar.jpg";
+  // Avatar rendering logic
+  const avatarPath =
+    avatar instanceof File
+      ? preview 
+      : (avatar?.startsWith("http")
+          ? avatar
+          : avatar || "/images/default-avatar.jpg");
 
   return (
     <div
@@ -138,7 +146,7 @@ const Profile = () => {
       {!isEditing ? (
         <>
           <div className="flex justify-center mb-4">
-            <Avatar src={userAvatarPath} className="w-20 h-20" />
+            <Avatar src={avatarPath} className="w-20 h-20" />
           </div>
 
           <p className="text-md text-[var(--color-charcoal-700)] dark:text-white text-center">
@@ -220,7 +228,7 @@ const Profile = () => {
               className="inputField cursor-pointer"
               disabled={loading}
             />
-            {avatar && !(avatar instanceof File) && (
+            {avatarPath && (
               <div className="mt-2 flex justify-center">
                 <Avatar src={avatarPath} className="w-20 h-20" />
               </div>

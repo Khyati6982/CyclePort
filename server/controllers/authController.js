@@ -1,5 +1,6 @@
 import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
+import { v2 as cloudinary } from 'cloudinary'
 
 // REGISTER USER
 export const registeredUser = async (req, res, next) => {
@@ -121,23 +122,33 @@ export const resetPassword = async (req, res, next) => {
   }
 }
 
-// GET PROFILE
+// GET USER PROFILE
 export const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).select('-password')
+    const user = await User.findById(req.user._id).select('-password');
     if (!user) {
-      const error = new Error('User not found.')
-      error.statusCode = 404
-      throw error
+      const error = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
     }
 
-    res.status(200).json({ user })
-  } catch (error) {
-    next(error)
-  }
-}
+    // Normalize avatar
+    const normalizedUser = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      avatar: user.avatar || '/images/default-avatar.jpg',
+    };
 
-// EDIT PROFILE
+    res.status(200).json({ user: normalizedUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// EDIT USER PROFILE
 export const editProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
@@ -153,29 +164,39 @@ export const editProfile = async (req, res, next) => {
     if (email) user.email = email;
     if (password) user.password = password;
 
-    // Handle avatar from Cloudinary OR fallback
+    //  Handle avatar upload to Cloudinary
     if (req.file) {
-      user.avatar = req.file.path; // Cloudinary URL if uploaded
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "profile",
+      });
+      user.avatar = result.secure_url; 
     } else if (avatar) {
-      user.avatar = avatar; // fallback if passed manually
+      user.avatar = avatar; 
     }
 
     const updatedUser = await user.save();
 
     // Always regenerate token after profile update
-    const token = jwt.sign({ id: updatedUser._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign(
+      { id: updatedUser._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    //Normalize avatar in response
+    const normalizedUser = {
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      avatar: updatedUser.avatar || '/images/default-avatar.jpg',
+      role: updatedUser.role,
+      isActive: updatedUser.isActive,
+    };
 
     res.status(200).json({
       message: 'Profile updated successfully.',
       token,
-      user: {
-        id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        avatar: updatedUser.avatar,
-        role: updatedUser.role,
-        isActive: updatedUser.isActive,
-      },
+      user: normalizedUser,
     });
   } catch (error) {
     next(error);

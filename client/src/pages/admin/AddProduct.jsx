@@ -73,15 +73,25 @@ const AddProduct = () => {
     }
 
     const formDataUpload = new FormData();
+
+    // Basic fields
     formDataUpload.append("name", form.name);
     formDataUpload.append("brand", form.brand);
     formDataUpload.append("category", form.category);
-    formDataUpload.append("price", form.price);
+    formDataUpload.append("price", Number(form.price)); 
     formDataUpload.append("description", form.description);
-    formDataUpload.append("countInStock", form.countInStock);
+    formDataUpload.append("countInStock", Number(form.countInStock || 0));
     formDataUpload.append("featured", form.featured);
-    formDataUpload.append("specs", JSON.stringify(form.specs));
-    formDataUpload.append("image", imageFile); // Cloudinary upload
+
+    // Specs fields 
+    formDataUpload.append("specs[frame]", form.specs.frame);
+    formDataUpload.append("specs[wheels]", form.specs.wheels);
+    formDataUpload.append("specs[weight]", form.specs.weight);
+    formDataUpload.append("specs[terrain]", form.specs.terrain);
+    formDataUpload.append("specs[electric]", form.specs.electric);
+
+    // Image (required for AddProduct)
+    formDataUpload.append("image", imageFile);
 
     setLoading(true);
     try {

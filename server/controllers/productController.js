@@ -1,12 +1,11 @@
 import Product from '../models/Product.js'
 import slugify from 'slugify'
+import { v2 as cloudinary } from 'cloudinary'
 
 // GET /api/products/featured
 export const getFeaturedProducts = async (req, res, next) => {
   try {
-    // Find products where featured = true
     const products = await Product.find({ featured: true });
-
     res.status(200).json({ products });
   } catch (err) {
     next(err);
@@ -113,11 +112,19 @@ export const createProduct = async (req, res, next) => {
       throw error;
     }
 
+    let imageUrl = req.body.image;
+    if(req.file) {
+      const resule = await cloudinary.ulploader.upload(req.file.path, {
+        folder: "products",
+      });
+      imageUrl = resule.secure_url;
+    }
+
     const newProduct = new Product({
       name,
       slug,
       description,
-      image: req.file ? req.file.path : req.body.image, // Cloudinary URL if uploaded
+      image: imageUrl,
       category,
       price,
       brand,
@@ -150,11 +157,16 @@ export const updateProduct = async (req, res, next) => {
       product.slug = slugify(name, { lower: true, strict: true });
     }
     if (description) product.description = description;
-    if (req.file) {
-      product.image = req.file.path; // Cloudinary URL if new file uploaded
+    
+    if(req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "products",
+      });
+      product.image = result.secure_url;
     } else if (req.body.image) {
-      product.image = req.body.image; // fallback if image passed manually
+      product.image = req.body.image;
     }
+
     if (category) product.category = category;
     if (price !== undefined && typeof price === 'number' && price > 0) product.price = price;
     if (brand) product.brand = brand;

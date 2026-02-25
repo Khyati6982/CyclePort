@@ -57,7 +57,6 @@ const EditProduct = () => {
         },
       });
 
-      // Cloudinary URLs are already complete
       setPreview(selectedProduct.image || "");
     }
   }, [selectedProduct]);
@@ -98,21 +97,32 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formDataSubmit = new FormData();
-    formDataSubmit.append("name", formData.name);
-    formDataSubmit.append("category", formData.category);
-    formDataSubmit.append("price", formData.price);
-    formDataSubmit.append("description", formData.description);
-    formDataSubmit.append("featured", formData.featured);
-    formDataSubmit.append("specs", JSON.stringify(formData.specs));
-
-    if (imageFile) {
-      formDataSubmit.append("image", imageFile);
-    } else if (formData.image) {
-      formDataSubmit.append("image", formData.image);
-    }
-
     try {
+      const formDataSubmit = new FormData();
+
+      // Basic fields
+      formDataSubmit.append("name", formData.name);
+      formDataSubmit.append("category", formData.category);
+      formDataSubmit.append("price", Number(formData.price));
+      formDataSubmit.append("description", formData.description);
+      formDataSubmit.append("brand", formData.brand || "");
+      formDataSubmit.append("countInStock", Number(formData.countInStock || 0));
+      formDataSubmit.append("featured", formData.featured);
+
+      // Specs fields
+      formDataSubmit.append("specs[frame]", formData.specs.frame);
+      formDataSubmit.append("specs[wheels]", formData.specs.wheels);
+      formDataSubmit.append("specs[weight]", formData.specs.weight);
+      formDataSubmit.append("specs[terrain]", formData.specs.terrain);
+      formDataSubmit.append("specs[electric]", formData.specs.electric);
+
+      // Image handling
+      if (imageFile) {
+        formDataSubmit.append("image", imageFile);
+      } else if (typeof formData.image === "string") {
+        formDataSubmit.append("image", formData.image);
+      }
+
       const { data } = await axios.put(`/api/products/${id}`, formDataSubmit, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -120,11 +130,11 @@ const EditProduct = () => {
         },
       });
 
-      toast.success(`Product "${data.product.name}" updated successfully!`);
+      toast.success("Product updated successfully!");
       navigate("/admin/products");
     } catch (err) {
       console.error("Update error:", err);
-      toast.error("Failed to update product.");
+      toast.error(err.response?.data?.message || "Failed to update product.");
     }
   };
 
