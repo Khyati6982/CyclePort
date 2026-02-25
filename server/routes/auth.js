@@ -38,7 +38,7 @@ router.post('/login', loginUser);
 router.get('/profile', protect, getProfile);
 
 // Profile update with Cloudinary upload
-router.put('/profile', protect, upload.single('image'), editProfile);
+router.put('/profile', protect, upload.single('avatar'), editProfile);
 
 // Password recovery flow
 router.post('/verify-email', verifyEmail);
