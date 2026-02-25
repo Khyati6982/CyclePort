@@ -20,10 +20,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [nameValid, setNameValid] = useState(true);
-  const [emailValid, setEmailValid] = useState(true);
-
+  
   useEffect(() => {
     if (user) {
       setName(user.name);
@@ -33,21 +30,12 @@ const Profile = () => {
     }
   }, [user]);
 
-  const validateName = (value) => {
-    setNameValid(value.trim().length >= 2);
-  };
-
-  const validateEmail = (value) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    setEmailValid(regex.test(value.trim()));
-  };
-
   // Upload avatar
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setAvatar(file); // store File
-    setPreview(URL.createObjectURL(file)); 
+    setPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
@@ -70,9 +58,9 @@ const Profile = () => {
 
     // Handle avatar correctly
     if (avatar instanceof File) {
-      formData.append("avatar", avatar); 
+      formData.append("avatar", avatar);
     } else if (typeof avatar === "string") {
-      formData.append("avatar", avatar); 
+      formData.append("avatar", avatar);
     }
 
     setLoading(true);
@@ -80,7 +68,6 @@ const Profile = () => {
       const { data } = await axios.put("/api/auth/profile", formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
         },
       });
 
@@ -98,8 +85,9 @@ const Profile = () => {
       setPassword("");
       setConfirmPassword("");
       setIsEditing(false);
-      setPreview(""); // reset preview after save
+      setPreview(""); 
     } catch (error) {
+      console.error("Profile update error:", error); 
       toast.error(error.response?.data?.message || "Update failed");
     } finally {
       setLoading(false);
@@ -129,10 +117,10 @@ const Profile = () => {
   // Avatar rendering logic
   const avatarPath =
     avatar instanceof File
-      ? preview 
-      : (avatar?.startsWith("http")
-          ? avatar
-          : avatar || "/images/default-avatar.jpg");
+      ? preview
+      : avatar?.startsWith("http")
+        ? avatar
+        : avatar || "/images/default-avatar.jpg";
 
   return (
     <div
