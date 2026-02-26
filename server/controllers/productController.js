@@ -118,7 +118,7 @@ export const createProduct = async (req, res, next) => {
     let imageUrl = req.body.image;
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "products",
+        folder: "cycleport/products",
       });
       imageUrl = result.secure_url; 
     }
@@ -163,7 +163,7 @@ export const updateProduct = async (req, res, next) => {
     
     if(req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "products",
+        folder: "cycleport/products",
       });
       product.image = result.secure_url;
     } else if (req.body.image) {

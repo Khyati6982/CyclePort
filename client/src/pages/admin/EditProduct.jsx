@@ -314,7 +314,7 @@ const EditProduct = () => {
             onChange={handleImageChange}
             className="w-full px-3 py-2 border rounded bg-white text-gray-900 
                dark:bg-gray-900 dark:text-gray-100 
-               focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+               focus:outline-none focus:ring-2 focus:ring-teal-500 transition cursor-pointer"
           />
           {preview && (
             <img
