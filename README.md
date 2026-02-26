@@ -16,6 +16,7 @@ CyclePort is a modern, recruiter‑ready full‑stack e‑commerce application d
 🔔 **Error Handling & Alerts** – Inline validation, toast notifications, and graceful fallbacks.  
 📱 **Responsive UI** – Optimized for desktop, tablet, and mobile.  
 🚀 **Multi‑Platform Deployment** – Frontend on Vercel, backend on Render, tested across Netlify too.  
+📷 **Image Uploads with Cloudinary** – Profile avatars and product images are securely stored and served via Cloudinary, ensuring optimized delivery and organized folder management (`cycleport/profile`, `cycleport/products`).
 
 ---
 
@@ -31,7 +32,8 @@ CyclePort is a modern, recruiter‑ready full‑stack e‑commerce application d
 ### Backend
 - **Express.js** – RESTful API routes for products, orders, and users.  
 - **MongoDB Atlas** – Cloud database for persistence.  
-- **Stripe Webhooks** – Automated payment confirmation and order updates.  
+- **Stripe Webhooks** – Automated payment confirmation and order updates.
+- **Cloudinary** – Cloud storage and CDN for user avatars and product images.
 
 ### Deployment & Tooling
 - **Vercel** – Frontend hosting.  
