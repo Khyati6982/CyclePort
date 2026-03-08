@@ -1,7 +1,7 @@
 # CyclePort 🚴‍♀️
 *A Full‑Stack E‑Commerce Website*
 
-CyclePort is a modern, recruiter‑ready full‑stack e‑commerce application designed for seamless online shopping. Featuring a polished UI, secure payment integration, and robust backend automation, it delivers a smooth experience for both customers and admins.
+CyclePort is a modern, full‑stack e‑commerce application designed for seamless online shopping. Featuring a polished UI, secure payment integration, and robust backend automation, it delivers a smooth experience for both customers and admins.
 
 ---
 
