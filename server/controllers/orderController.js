@@ -1,8 +1,8 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 
-// Helper function to decrement stocks after creating the order
-const decrementStock = async (items) => {
+// Helper function to decrement stocks after a successful payment
+export const decrementStock = async (items) => {
   for (const item of items) {
     try {
       const product = await Product.findById(item.productId || item._id);
@@ -16,8 +16,8 @@ const decrementStock = async (items) => {
   }
 };
 
-// Helper function to restore stocks after deleting the order
-const restoreStock = async (items) => {
+// Helper function to restore stocks after a failed payment or order deletion
+export const restoreStock = async (items) => {
   for (const item of items) {
     try {
       const product = await Product.findById(item.productId || item._id);
@@ -70,9 +70,8 @@ export const createOrder = async (req, res, next) => {
     });
 
     await order.save();
-    await decrementStock(order.items);
 
-    // Return customOrderId so frontend can use it in Stripe metadata
+    // Do not decrement stock here. Inventory should only be reserved after the payment is confirmed by Stripe, so failed payments can safely roll back.
     res.status(201).json({ order, customOrderId });
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error", error: err.message });
