@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import Order from '../models/Order.js';
-import { decrementStock, restoreStock } from './orderController.js';
+import { decrementStock } from './orderController.js';
 
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -84,15 +84,11 @@ export const stripeWebhook = async (req, res, next) => {
         if (customOrderId) {
           const order = await Order.findOne({ customOrderId });
           if (order) {
-            if (order.status !== 'failed') {
-              await restoreStock(order.items);
-            }
-
             order.isPaid = false;
             order.status = 'failed';
             order.paidAt = order.paidAt || null;
             await order.save();
-            console.log("❌ Order marked failed and stock restored:", order._id);
+            console.log("❌ Order marked failed:", order._id);
           } else {
             console.warn("⚠️ No order found for OrderId:", customOrderId);
           }
