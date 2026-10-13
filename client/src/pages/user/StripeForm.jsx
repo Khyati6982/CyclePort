@@ -106,7 +106,6 @@ const StripeForm = ({ total, billingDetails }) => {
         clientSecret,
         confirmParams: {
           return_url: `${window.location.origin}/payment-success`,
-          cancel_url: `${window.location.origin}/payment-cancel`,
         },
         redirect: "if_required",
       });
